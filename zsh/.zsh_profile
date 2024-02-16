@@ -19,7 +19,7 @@ export PATH="$PATH:/usr/local/go/bin"
 
 
 # Others
-export DOTFILES=$HOME/.dotfiles
+export DOTFILES=$HOME/dotfiles
 
 ######################################################################################
 # Custom Keyboard Shortcuts
