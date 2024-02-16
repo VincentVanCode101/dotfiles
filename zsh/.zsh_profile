@@ -1,0 +1,60 @@
+# Aliases
+alias k="kubectl"
+alias dfu="docker compose -f docker-compose.dev.yml up"
+alias dfd="docker compose -f docker-compose.dev.yml down"
+alias dfb="docker compose -f docker-compose.dev.yml build"
+alias dcb="docker compose build"
+alias dcu="docker compose up"
+
+alias asdf="setxkbmap real-prog-dvorak"
+alias aoeu="setxkbmap de-chris"
+
+# PATH Extensions
+export PATH="$PATH:$HOME/little-projects/unix-shell-scripts"
+export PATH="$PATH:$HOME/toolbox-exec"
+export PATH="$PATH:~/.local/bin"
+export PATH="$PATH:/usr/local/go/bin"
+
+
+
+
+# Others
+export DOTFILES=$HOME/.dotfiles
+
+######################################################################################
+# Custom Keyboard Shortcuts
+######################################################################################
+
+# Connect to Container Shortcut
+connectToContainer() {
+    ~/little-projects/unix-shell-scripts/connectToContainer.sh
+}
+
+# Uncomment the below line if you want to enable the zle widget for connectToContainer
+# zle -N connectToContainer
+
+# Bind the connectToContainer function to Alt+e
+bindkey -s "^[e" "connectToContainer\n"
+
+
+
+bindkey -s ^f "tmux-sessionizer\n"
+
+######################################################################################
+# FZF Settings
+######################################################################################
+export FZF_DEFAULT_COMMAND="find ~/ -maxdepth 2 -type d 2> /dev/null"
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_DEFAULT_OPTS="--height 90% --ansi"
+
+# Powerlevel10k Prompt Customization
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+# FZF Shell Integration
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+######################################################################################
+# End of .zsh_profile
+######################################################################################
+
