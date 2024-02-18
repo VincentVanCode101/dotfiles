@@ -1,0 +1,42 @@
+{
+  "layout": "splith",
+  "percent": 0.5,
+  "type": "con",
+  "nodes": [
+    {
+      "name": "obsidian",
+      "type": "con",
+      "swallows": [
+        {
+          "class": "^obsidian$"
+        }
+      ]
+    },
+    {
+      "type": "con",
+      "layout": "splitv",
+      "nodes": [
+        {
+          "name": "nautilus",
+          "percent": 0.9,
+          "type": "con",
+          "swallows": [
+            {
+              "class": "Org.gnome.Nautilus"
+            }
+          ]
+        },
+        {
+          "name": "gnome-terminal",
+          "percent": 0.1,
+          "type": "con",
+          "swallows": [
+            {
+              "class": "Gnome-terminal"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

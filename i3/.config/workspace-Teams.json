@@ -1,0 +1,49 @@
+{
+  // Ihr vorhandener Container
+  "border": "normal",
+  "floating": "auto_off",
+  "layout": "splith",
+  "marks": [],
+  "percent": null,
+  "type": "con",
+  "nodes": [
+    {
+      "border": "normal",
+      "current_border_width": 1,
+      "floating": "auto_off",
+      "geometry": {
+        "height": 1060,
+        "width": 945,
+        "x": 10,
+        "y": 10
+      },
+      "marks": [],
+      "name": "Microsoft Teams Classic - initializing...",
+      "percent": 0.5,
+      "swallows": [
+        {
+          "class": "teams.microsoft.com",
+          "instance": "Google-chrome",
+          "title": "Microsoft Teams classic"
+        }
+      ],
+      "type": "con"
+    },
+    {
+      "border": "normal",
+      "current_border_width": 1,
+      "floating": "auto_off",
+      "geometry": {
+        "height": 1060,
+        "width": 945,
+        "x": 10,
+        "y": 10
+      },
+      "marks": [],
+      "name": "Microsoft Teams Classic - initializing...",
+      "percent": 0.5,
+      "swallows": [{}],
+      "type": "con"
+    }
+  ]
+}
