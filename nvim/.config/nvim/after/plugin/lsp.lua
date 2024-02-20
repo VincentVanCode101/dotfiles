@@ -21,7 +21,9 @@ end)
 -- read this: https://github.com/VonHeikemen/lsp-zero.nvim/blob/v3.x/doc/md/guides/integrate-with-mason-nvim.md
 require('mason').setup({})
 require('mason-lspconfig').setup({
-	ensure_installed = {'tsserver', 'jdtls', 'jedi_language_server', 'snyk_ls', 'gopls'},
+	ensure_installed = {
+        'clangd', 'clang-format', 'codelldb',
+        'tsserver', 'jdtls', 'jedi_language_server', 'snyk_ls', 'gopls'},
 	handlers = {
 		lsp_zero.default_setup,
 --		lua_ls = function()
