@@ -22,8 +22,12 @@ end)
 require('mason').setup({})
 require('mason-lspconfig').setup({
 	ensure_installed = {
-        'clangd', 'clang-format', 'codelldb',
-        'tsserver', 'jdtls', 'jedi_language_server', 'snyk_ls', 'gopls'},
+        'clangd',
+        'tsserver',
+        'jdtls',
+        'jedi_language_server',
+        'snyk_ls',
+        'gopls'},
 	handlers = {
 		lsp_zero.default_setup,
 --		lua_ls = function()

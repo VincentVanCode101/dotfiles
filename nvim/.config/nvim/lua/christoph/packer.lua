@@ -15,7 +15,7 @@ return require('packer').startup(function(use)
 
 
 
-   -- require('onenord').setup()
+    -- require('onenord').setup()
     use 'rmehri01/onenord.nvim'
     vim.cmd('colorscheme onenord')
 
@@ -39,11 +39,11 @@ return require('packer').startup(function(use)
         'lukas-reineke/indent-blankline.nvim',
         main = "ibl",
         config = function()
-                       require("ibl").setup({
-                           indent = {
-                               char = "│",
-                           },
-                       })
+            require("ibl").setup({
+                indent = {
+                    char = "│",
+                },
+            })
         end
     }
 
@@ -84,6 +84,14 @@ return require('packer').startup(function(use)
             { 'hrsh7th/nvim-cmp' },
             { 'hrsh7th/cmp-nvim-lsp' },
             { 'L3MON4D3/LuaSnip' },
+        }
+    }
+
+    use {
+        "ThePrimeagen/refactoring.nvim",
+        requires = {
+            { "nvim-lua/plenary.nvim" },
+            { "nvim-treesitter/nvim-treesitter" }
         }
     }
 end)

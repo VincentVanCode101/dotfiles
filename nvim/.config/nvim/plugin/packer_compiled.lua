@@ -140,6 +140,11 @@ _G.packer_plugins = {
     path = "/home/christoph/.local/share/nvim/site/pack/packer/start/plenary.nvim",
     url = "https://github.com/nvim-lua/plenary.nvim"
   },
+  ["refactoring.nvim"] = {
+    loaded = true,
+    path = "/home/christoph/.local/share/nvim/site/pack/packer/start/refactoring.nvim",
+    url = "https://github.com/ThePrimeagen/refactoring.nvim"
+  },
   ["telescope.nvim"] = {
     loaded = true,
     path = "/home/christoph/.local/share/nvim/site/pack/packer/start/telescope.nvim",
