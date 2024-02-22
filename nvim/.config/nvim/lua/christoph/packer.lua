@@ -14,7 +14,6 @@ return require('packer').startup(function(use)
     }
 
 
-
     -- require('onenord').setup()
     use 'rmehri01/onenord.nvim'
     vim.cmd('colorscheme onenord')
@@ -87,6 +86,7 @@ return require('packer').startup(function(use)
         }
     }
 
+    -- Refactoring by the primeagen
     use {
         "ThePrimeagen/refactoring.nvim",
         requires = {
@@ -94,4 +94,24 @@ return require('packer').startup(function(use)
             { "nvim-treesitter/nvim-treesitter" }
         }
     }
+
+
+
+    -- Zenmode
+    use("folke/zen-mode.nvim")
+
+
+
+    -- Trouble
+    use({
+        "folke/trouble.nvim",
+        config = function()
+            require("trouble").setup {
+                icons = false,
+                -- your configuration comes here
+                -- or leave it empty to use the default settings
+                -- refer to the configuration section below
+            }
+        end
+    })
 end)
