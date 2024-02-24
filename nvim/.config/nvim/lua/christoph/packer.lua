@@ -12,23 +12,15 @@ return require('packer').startup(function(use)
         -- or                            , branch = '0.1.x',
         requires = { { 'nvim-lua/plenary.nvim' } }
     }
-
+    --    use('rose-pine/neovim')
+    --   vim.cmd('colorscheme rose-pine')
 
     -- require('onenord').setup()
-    use 'rmehri01/onenord.nvim'
-    vim.cmd('colorscheme onenord')
+    -- use 'rmehri01/onenord.nvim'
+    -- vim.cmd('colorscheme onenord')
 
-    --use({
-    --    'projekt0n/github-nvim-theme',
-    --    config = function()
-    --        require('github-theme').setup({
-    --            -- ...
-    --        })
-
-    --        vim.cmd('colorscheme github_light')
-    --    end
-    --})
-    --vim.cmd('colorscheme github_light')
+    use('projekt0n/github-nvim-theme')
+    vim.cmd('colorscheme github_light')
 
     --use 'Mofiqul/vscode.nvim'
     --require('vscode').setup()
@@ -100,7 +92,10 @@ return require('packer').startup(function(use)
     -- Zenmode
     use("folke/zen-mode.nvim")
 
-
+    use {
+        'nvim-lualine/lualine.nvim',
+        requires = { 'nvim-tree/nvim-web-devicons', opt = true }
+    }
 
     -- Trouble
     use({
