@@ -163,10 +163,10 @@ return require('packer').startup(function(use)
                 popup_border_style = "rounded",
                 enable_git_status = true,
                 enable_diagnostics = true,
-                enable_normal_mode_for_inputs = false,                     -- Enable normal mode for input dialogs.
+                enable_normal_mode_for_inputs = false,                             -- Enable normal mode for input dialogs.
                 open_files_do_not_replace_types = { "terminal", "trouble", "qf" }, -- when opening files, do not use windows containing these filetypes or buftypes
-                sort_case_insensitive = false,                             -- used when sorting files and directories in the tree
-                sort_function = nil,                                       -- use a custom function for sorting files and directories in the tree
+                sort_case_insensitive = false,                                     -- used when sorting files and directories in the tree
+                sort_function = nil,                                               -- use a custom function for sorting files and directories in the tree
                 -- sort_function = function (a,b)
                 --       if a.type == b.type then
                 --           return a.path > b.path
@@ -337,11 +337,11 @@ return require('packer').startup(function(use)
                         },
                     },
                     follow_current_file = {
-                        enabled = false,          -- This will find and focus the file in the active buffer every time
+                        enabled = false,                -- This will find and focus the file in the active buffer every time
                         --               -- the current file is changed while the tree is open.
-                        leave_dirs_open = false,  -- `false` closes auto expanded dirs, such as with `:Neotree reveal`
+                        leave_dirs_open = false,        -- `false` closes auto expanded dirs, such as with `:Neotree reveal`
                     },
-                    group_empty_dirs = false,     -- when true, empty folders will be grouped together
+                    group_empty_dirs = false,           -- when true, empty folders will be grouped together
                     hijack_netrw_behavior = "disabled", -- netrw disabled, opening a directory opens neo-tree
                     netrw_hijack_behavior = "disabled", -- netrw disabled, opening a directory opens neo-tree
                     -- in whatever position is specified in window.position
@@ -384,11 +384,11 @@ return require('packer').startup(function(use)
                 },
                 buffers = {
                     follow_current_file = {
-                        enabled = true, -- This will find and focus the file in the active buffer every time
+                        enabled = true,          -- This will find and focus the file in the active buffer every time
                         --              -- the current file is changed while the tree is open.
                         leave_dirs_open = false, -- `false` closes auto expanded dirs, such as with `:Neotree reveal`
                     },
-                    group_empty_dirs = true, -- when true, empty folders will be grouped together
+                    group_empty_dirs = true,     -- when true, empty folders will be grouped together
                     show_unloaded = true,
                     window = {
                         mappings = {
@@ -427,7 +427,44 @@ return require('packer').startup(function(use)
                     }
                 }
             })
-
         end
     }
+
+
+
+
+
+
+    require('packer').startup(function()
+        -- Andere Plugin-Konfigurationen hier...
+
+        use {
+            'nvim-java/nvim-java',
+            dependencies = {
+                'nvim-java/lua-async-await',
+                'nvim-java/nvim-java-core',
+                'nvim-java/nvim-java-test',
+                'nvim-java/nvim-java-dap',
+                'MunifTanjim/nui.nvim',
+                'neovim/nvim-lspconfig',
+                'mfussenegger/nvim-dap',
+                {
+                    'williamboman/mason.nvim',
+                    opts = {
+                        registries = {
+                            'github:nvim-java/mason-registry',
+                            'github:mason-org/mason-registry',
+                        },
+                    },
+                }
+            },
+        }
+
+        -- Weitere Plugins können hier hinzugefügt werden...
+    end)
+    -- Setup nvim-java
+    require('java').setup()
+
+    -- Setup jdtls
+    require('lspconfig').jdtls.setup({})
 end)
