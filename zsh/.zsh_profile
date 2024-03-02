@@ -11,7 +11,7 @@ alias aoeu="setxkbmap de-chris"
 
 # PATH Extensions
 export PATH="$PATH:$HOME/little-projects/unix-shell-scripts"
-export PATH="$PATH:$HOME/toolbox-exec"
+export PATH="$PATH:$HOME/projects/toolbox-exec"
 export PATH="$PATH:$HOME/.local/bin/scripts"
 export PATH="$PATH:/usr/local/go/bin"
 

@@ -134,3 +134,7 @@ ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=9"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
 source ~/.zsh_profile
+
+# Add JBang to environment
+alias j!=jbang
+export PATH="$HOME/.jbang/bin:$PATH"

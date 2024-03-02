@@ -429,42 +429,5 @@ return require('packer').startup(function(use)
             })
         end
     }
-
-
-
-
-
-
-    require('packer').startup(function()
-        -- Andere Plugin-Konfigurationen hier...
-
-        use {
-            'nvim-java/nvim-java',
-            dependencies = {
-                'nvim-java/lua-async-await',
-                'nvim-java/nvim-java-core',
-                'nvim-java/nvim-java-test',
-                'nvim-java/nvim-java-dap',
-                'MunifTanjim/nui.nvim',
-                'neovim/nvim-lspconfig',
-                'mfussenegger/nvim-dap',
-                {
-                    'williamboman/mason.nvim',
-                    opts = {
-                        registries = {
-                            'github:nvim-java/mason-registry',
-                            'github:mason-org/mason-registry',
-                        },
-                    },
-                }
-            },
-        }
-
-        -- Weitere Plugins können hier hinzugefügt werden...
-    end)
-    -- Setup nvim-java
-    require('java').setup()
-
-    -- Setup jdtls
-    require('lspconfig').jdtls.setup({})
+    use 'mfussenegger/nvim-jdtls'
 end)
