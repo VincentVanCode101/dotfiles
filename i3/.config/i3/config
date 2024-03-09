@@ -318,11 +318,12 @@ bindsym Ctrl+Shift+Print exec --no-startup-id maim --select | xclip -selection c
 ####################################################################################
 
 # class of the borders            border          background      text            indicator       child_border
-# this is black on red
-client.focused                    #ff0000         #ff9999         #000000         $coloratt       #ff0000
+# the following line is a red border arround the focused window
+#client.focused                    #ff0000         #ff9999         #000000         $coloratt       #ff0000
 
-# this is yellow on red
+# the following line is a yellow border arround the focused window
 # client.focused                    #ffff33         #000000         #ffff33         $coloratt       #ffff33
+
 # client.focused_inactive         #333333         #000000         #ffff33         $coloratt       #000000
 client.unfocused                #333333         #000000         #888888         $coloratt       #000000
 client.focused_inactive                #333333         #000000         #888888         $coloratt       #000000
@@ -366,8 +367,9 @@ bindsym $mod+Ctrl+period exec --no-startup-id ~/little-projects/unix-shell-scrip
 ####################################################################################
 
 # exec my note-taking application
-bindsym $mod+n exec --no-startup-id ~/.local/bin/scripts/notes.sh
-for_window [title=".*nvim /home/christoph/notes.*"] floating enable
+bindsym $mod+n exec --no-startup-id ~/.local/bin/scripts/notes.sh "$HOME/personal/notes"
+bindsym $mod+shift+n exec --no-startup-id ~/.local/bin/scripts/notes.sh "$HOME/work/notes"
+for_window [title=".*nvim /home/christoph/.*/notes.*"] floating enable
 
 # exec nautilus (file-manager)
 bindsym $mod+Ctrl+n exec --no-startup-id nautilus

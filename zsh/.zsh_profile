@@ -37,6 +37,7 @@ connectToContainer() {
 bindkey -s "^[e" "connectToContainer\n"
 
 
+bindkey -s "^[g" "gitcheckoutFZF\n"
 
 bindkey -s ^f "tmux-sessionizer\n"
 
