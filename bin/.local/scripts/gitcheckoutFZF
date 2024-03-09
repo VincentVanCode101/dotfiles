@@ -1,0 +1,14 @@
+#!/bin/bash
+
+
+# Get list of local branches
+local_branches=$(git branch | sed 's/* //' | sed 's/ //g')
+
+# Get list of remote branches without 'origin/' prefix and remove any that already exist locally
+remote_branches=$(git branch -r | grep -v 'HEAD' | sed 's/origin\///' | sed 's/ //g' | grep -vFf <(echo "$local_branches"))
+
+# Combine local and remote branches, remove duplicates, then select one with fzf
+selected_branch=$(echo -e "${local_branches}\n${remote_branches}" | sort | uniq | fzf)
+
+# Checkout selected branch
+git checkout "$selected_branch"
