@@ -367,8 +367,8 @@ bindsym $mod+Ctrl+period exec --no-startup-id ~/little-projects/unix-shell-scrip
 ####################################################################################
 
 # exec my note-taking application
-bindsym $mod+n exec --no-startup-id ~/.local/bin/scripts/notes.sh "$HOME/personal/notes"
-bindsym $mod+shift+n exec --no-startup-id ~/.local/bin/scripts/notes.sh "$HOME/work/notes"
+bindsym $mod+n exec --no-startup-id ~/.local/scripts/notes.sh "$HOME/personal/notes/secondBrain"
+bindsym $mod+shift+n exec --no-startup-id ~/.local/scripts/notes.sh "$HOME/work/notes"
 for_window [title=".*nvim /home/christoph/.*/notes.*"] floating enable
 
 # exec nautilus (file-manager)
