@@ -430,4 +430,26 @@ return require('packer').startup(function(use)
         end
     }
     use 'mfussenegger/nvim-jdtls'
+    use({
+        "epwalsh/obsidian.nvim",
+        tag = "*", -- recommended, use latest release instead of latest commit
+        requires = {
+            -- Required.
+            "nvim-lua/plenary.nvim",
+
+            -- see below for full list of optional dependencies 👇
+        },
+        config = function()
+            require("obsidian").setup({
+                workspaces = {
+                    {
+                        name = "personal",
+                        path = "~/personal/notes/secondBrain",
+                    },
+                },
+
+                -- see below for full list of options 👇
+            })
+        end,
+    })
 end)
