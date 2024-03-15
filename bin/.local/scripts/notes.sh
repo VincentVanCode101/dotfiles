@@ -16,5 +16,5 @@ touch "$FILE_PATH"
 GEOMETRY="180x44+0+0"
 
 # Open a new gnome-terminal window with specified geometry and change directory to NOTE_PATH
-gnome-terminal --geometry=$GEOMETRY -- bash -c "echo -ne '\033]0;nvim $FILE_PATH\007'; nvim $FILE_PATH; exec zsh"
+gnome-terminal --geometry=$GEOMETRY -- bash -c "echo -ne '\033]0;nvim $FILE_PATH\007'; cd $NOTE_PATH && nvim $FILENAME; exec zsh"
 
