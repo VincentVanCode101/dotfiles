@@ -9,12 +9,21 @@ FILENAME="note_${YEAR}_W${CALENDAR_WEEK}.md"
 
 FILE_PATH="$NOTE_PATH/$FILENAME"
 
-touch "$FILE_PATH"
+# Check if file already exists to avoid overwriting
+if [ ! -f "$FILE_PATH" ]; then
+    cat <<EOF > "$FILE_PATH"
+---
+id: note_${YEAR}_W${CALENDAR_WEEK}
+aliases: 
+tags:
+  - weekly-notes
+links: "[[weekly-notes]]"
+---
 
-
+EOF
+fi
 
 GEOMETRY="180x44+0+0"
 
-# Open a new gnome-terminal window with specified geometry and change directory to NOTE_PATH
 gnome-terminal --geometry=$GEOMETRY -- bash -c "echo -ne '\033]0;nvim $FILE_PATH\007'; cd $NOTE_PATH && nvim $FILENAME; exec zsh"
 

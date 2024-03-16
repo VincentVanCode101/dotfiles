@@ -5,6 +5,7 @@ alias dfd="docker compose -f docker-compose.dev.yml down"
 alias dfb="docker compose -f docker-compose.dev.yml build"
 alias dcb="docker compose build"
 alias dcu="docker compose up"
+alias fd="fdfind"
 
 alias asdf="setxkbmap real-prog-dvorak"
 alias aoeu="setxkbmap de-chris"

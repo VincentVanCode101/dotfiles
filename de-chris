@@ -4,14 +4,14 @@ xkb_symbols "de-chris" {
     include "de(basic)" // Include the basic German layout
 
     // Custom mappings for the number row
-    key <AE01> { [ exclam, 1, slash ] };
-    key <AE02> { [ bracketleft, 2, quotedbl ] }; // AltGr + <AE02> for "
-    key <AE03> { [ braceleft, 3, section ] }; // AltGr + <AE03> for §
+    key <AE01> { [ exclam, 1, section ] }; // AltGr + <AE01> for §
+    key <AE02> { [ bracketleft, 2, quotedbl ] };
+    key <AE03> { [ braceleft, 3, slash ] }; // AltGr + <AE03> for /
     key <AE04> { [ parenleft, 4, dollar ] };
-    key <AE05> { [ percent, 5 ] };
-    key <AE06> { [ ampersand, 6 ] };
+    key <AE05> { [ ampersand, 5, percent ] };
+    key <AE06> { [ equal, 6 ] };
     key <AE07> { [ parenright, 7 ] };
-    key <AE08> { [ braceright, 8 ] };
+    key <AE08> { [ braceright, 8, backslash ] };
     key <AE09> { [ bracketright, 9 ] };
     key <AE10> { [ equal, 0 ] };
 };

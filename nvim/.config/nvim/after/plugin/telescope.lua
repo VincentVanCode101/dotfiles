@@ -1,8 +1,16 @@
+require('telescope').setup({
+    defaults = {
+        file_ignore_patterns = { '^node_modules/', '^.obsidian/' },
+    }
+})
+
 local builtin = require('telescope.builtin')
 
 -- Modify this key mapping to include hidden files in the search
+
 vim.keymap.set('n', '<leader>pf', function() builtin.find_files({ hidden = true }) end, {})
 
+vim.keymap.set('n', '<leader>lg', builtin.live_grep, {})
 
 vim.keymap.set('n', '<C-p>', builtin.git_files, {})
 
