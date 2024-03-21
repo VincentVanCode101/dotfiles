@@ -47,9 +47,13 @@ bindkey -s ^f "tmux-sessionizer\n"
 ######################################################################################
 # FZF Settings
 ######################################################################################
-export FZF_DEFAULT_COMMAND="find ~/ -maxdepth 2 -type d 2> /dev/null"
+export FZF_DEFAULT_COMMAND="find ~/ -maxdepth 4 -type d ! -path '*/.git/*' ! -path '*/.vscode/*' 2> /dev/null"
+#export FZF_DEFAULT_COMMAND="fd . '/home/christoph/' --type directory --max-depth 4'
+
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_DEFAULT_OPTS="--height 90% --ansi"
+
+
 
 # Powerlevel10k Prompt Customization
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
