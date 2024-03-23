@@ -132,7 +132,6 @@ ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=9"
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-set -o vi
 source ~/.zsh_profile
 
 # Add JBang to environment
