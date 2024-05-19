@@ -39,6 +39,7 @@ connectToContainer() {
 # Bind the connectToContainer function to Alt+e
 bindkey -s "^[e" "connectToContainer\n"
 
+bindkey -s "^[a" "gitAdd.sh\n"
 
 bindkey -s "^[g" "gitcheckoutFZF\n"
 
