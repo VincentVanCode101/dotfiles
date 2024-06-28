@@ -5,7 +5,9 @@ alias dfd="docker compose -f docker-compose.dev.yml down"
 alias dfb="docker compose -f docker-compose.dev.yml build"
 alias dcb="docker compose build"
 alias dcu="docker compose up"
+alias dcd="docker compose down"
 alias fd="fdfind"
+alias bat="batcat"
 
 alias asdf="setxkbmap real-prog-dvorak"
 alias aoeu="setxkbmap de-chris"
@@ -54,6 +56,9 @@ export FZF_DEFAULT_COMMAND="find ~/ -maxdepth 4 -type d ! -path '*/.git/*' ! -pa
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_DEFAULT_OPTS="--height 90% --ansi"
 
+if [[ $FIND_IT_FASTER_ACTIVE -eq 1 ]]; then
+  FZF_DEFAULT_OPTS='--height=70%'
+fi
 
 
 # Powerlevel10k Prompt Customization
@@ -66,4 +71,5 @@ export FZF_DEFAULT_OPTS="--height 90% --ansi"
 ######################################################################################
 # End of .zsh_profile
 ######################################################################################
+
 
