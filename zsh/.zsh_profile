@@ -12,6 +12,8 @@ alias bat="batcat"
 alias asdf="setxkbmap real-prog-dvorak"
 alias aoeu="setxkbmap de-chris"
 
+alias amsk-whitelist-ip-dev='xdg-open https://gitlab.diva-e.com/amsk/amsk-cluster/amsk-cluster-api-whitelist/-/pipelines/new?var[IP]=$(curl -s ipinfo.io/ip)'
+
 # PATH Extensions
 export PATH="$PATH:$HOME/little-projects/unix-shell-scripts"
 export PATH="$PATH:$HOME/little-projects/unix-shell-scripts"
