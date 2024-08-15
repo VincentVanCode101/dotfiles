@@ -404,8 +404,10 @@ bindsym $mod+c exec zenity --calendar
 ####################################################################################
 ####################################################################################
 
-bindsym $mod+Ctrl+P exec --no-startup-id /home/christoph/privat/telegram_clipboard_sender_repo/telegram-clipboard-sender/.venv/bin/python /home/christoph/privat/telegram_clipboard_sender_repo/telegram-clipboard-sender/telegram_clipboard_sender.py
-bindsym $mod+Ctrl+a exec --no-startup-id /home/christoph/privat/telegram_clipboard_sender_repo/telegram-clipboard-sender/.venv/bin/python /home/christoph/privat/telegram_clipboard_sender_repo/telegram-clipboard-sender/crawl_deepl.py clipboard-translation
+bindsym $mod+Ctrl+P exec --no-startup-id /home/christoph/projects/GoCrawlDeepl/run.sh
+
+# bindsym $mod+Ctrl+P exec --no-startup-id /home/christoph/privat/telegram_clipboard_sender_repo/telegram-clipboard-sender/.venv/bin/python /home/christoph/privat/telegram_clipboard_sender_repo/telegram-clipboard-sender/telegram_clipboard_sender.py
+# bindsym $mod+Ctrl+a exec --no-startup-id /home/christoph/privat/telegram_clipboard_sender_repo/telegram-clipboard-sender/.venv/bin/python /home/christoph/privat/telegram_clipboard_sender_repo/telegram-clipboard-sender/crawl_deepl.py clipboard-translation
 
 #bindsym $mod+Ctrl+P exec --no-startup-id /home/christoph/other-little-applications/clipboard-syncing/.venv/bin/python /home/christoph/other-little-applications/clipboard-syncing/__main__.py set-clipboard
 
