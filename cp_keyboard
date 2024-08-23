@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-sudo cp de-chris /usr/share/X11/xkb/symbols

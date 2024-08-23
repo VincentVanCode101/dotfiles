@@ -14,15 +14,23 @@ alias yxcv="setxkbmap de"
 
 alias amsk-whitelist-ip-dev='xdg-open https://gitlab.diva-e.com/amsk/amsk-cluster/amsk-cluster-api-whitelist/-/pipelines/new?var[IP]=$(curl -s ipinfo.io/ip)'
 
+alias j!="jbang"
+
 # PATH Extensions
 export PATH="$PATH:$HOME/little-projects/unix-shell-scripts"
 export PATH="$PATH:$HOME/little-projects/unix-shell-scripts"
 export PATH="$PATH:$HOME/projects/toolbox-exec"
 export PATH="$PATH:$HOME/.local/scripts"
+export PATH="$PATH:$HOME/.jbang/bin"
+
+export PATH="$PATH:/usr/local/go/bin"
 export PATH="$PATH:/usr/local/go/bin"
 
+export NVM_DIR="$HOME/.nvm"
 
-export PATH="$HOME/.local/.npm-global/bin:$PATH"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
 
 
 # Others
