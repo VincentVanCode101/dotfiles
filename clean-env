@@ -1,9 +1,22 @@
 #!/usr/bin/env zsh
 
 pushd $DOTFILES
+
 for folder in $(echo $STOW_FOLDERS | sed "s/,/ /g")
 do
-    echo "Removing $folder"
-    stow -D $folder
+    echo "Cleaning up files from $folder"
+
+    # Find all files within the folder
+    find $folder -type f | while read file; do
+        # Determine the target file location in the home directory
+        target="$HOME/${file#$folder/}"
+
+        # Check if the target file exists and remove it
+        if [ -e "$target" ]; then
+            echo "Removing $target"
+            rm "$target"
+        fi
+    done
 done
+
 popd
