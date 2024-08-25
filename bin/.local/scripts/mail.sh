@@ -1,0 +1,3 @@
+#!/bin/bash
+
+google-chrome --app=https://outlook.office.com/mail/

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+WINDOW_NAME="Microsoft Teams"
+
+if xdotool search --name "$WINDOW_NAME" windowactivate --sync; then
+  echo "window $WINDOW_NAME found and focus shifted" &>/dev/null
+else
+	google-chrome --app=https://teams.microsoft.com/ &
+fi
+

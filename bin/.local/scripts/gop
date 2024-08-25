@@ -1,0 +1,8 @@
+# !bin/bash
+
+echo "Lets hope this wasn't a mistake..."  
+git add --all
+git commit -m"$(date)"
+git push origin $(git symbolic-ref --short HEAD)
+echo "No it was not"
+

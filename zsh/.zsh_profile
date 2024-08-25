@@ -42,7 +42,7 @@ export DOTFILES=$HOME/dotfiles
 
 # Connect to Container Shortcut
 connectToContainer() {
-    ~/little-projects/unix-shell-scripts/connectToContainer.sh
+    ~/.local/scripts/connectToContainer.sh
 }
 
 # Uncomment the below line if you want to enable the zle widget for connectToContainer

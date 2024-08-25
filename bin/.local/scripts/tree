@@ -1,0 +1,10 @@
+#!/bin/bash
+
+depthLevel="$1"
+
+if [ -z $depthLevel ]; then
+	depthLevel=2
+fi
+
+exa --tree --level=$depthLevel --long 
+

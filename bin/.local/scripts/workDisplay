@@ -1,0 +1,10 @@
+#!/bin/bash
+
+
+xrandr --output DP-3-2 --off
+xrandr --output DP-3-3 --off
+xrandr --output HDMI-1 --off
+
+xrandr --output eDP-1 --auto --output DP-3-3 --auto --right-of eDP-1 --output DP-3-2 --auto --rotate left --right-of DP-3-3
+
+nitrogen --restore

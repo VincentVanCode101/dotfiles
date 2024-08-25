@@ -125,27 +125,27 @@ bindsym $mod+e layout toggle split
 # Define names for default workspaces for which we configure key bindings later on.
 # We use variables to avoid repeating the names in multiple places.
 
-#set $ws1 "1"
-#set $ws2 "2"
+set $ws1 "1"
+set $ws2 "2"
 set $ws3 "3"
 set $ws4 "4"
 set $ws5 "5"
 set $ws6 "6"
 set $ws7 "7"
 set $ws8 "8"
-#set $ws9 "9"
-#set $ws10 "10"
+set $ws9 "9"
+set $ws10 "10"
 
-#set $ws11 "11"
-#set $ws12 "12"
+set $ws11 "11"
+set $ws12 "12"
 set $ws13 "13"
 set $ws14 "14"
 set $ws15 "15"
 set $ws16 "16"
 set $ws17 "17"
 set $ws18 "18"
-#set $ws19 "19"
-#set $ws20 "20"
+set $ws19 "19"
+set $ws20 "20"
 
 
 set $wsW "WhatsApp"
@@ -159,28 +159,28 @@ bindsym $mod+$mod2+m move container to workspace $wsM
 
 
 # switch to workspace
-#bindsym $mod+1 workspace number $ws1
-#bindsym $mod+2 workspace number $ws2
+bindsym $mod+1 workspace number $ws1
+bindsym $mod+2 workspace number $ws2
 bindsym $mod+3 workspace number $ws3
 bindsym $mod+4 workspace number $ws4
 bindsym $mod+5 workspace number $ws5
 bindsym $mod+6 workspace number $ws6
 bindsym $mod+7 workspace number $ws7
 bindsym $mod+8 workspace number $ws8
-#bindsym $mod+9 workspace number $ws9
-#bindsym $mod+0 workspace number $ws10
+bindsym $mod+9 workspace number $ws9
+bindsym $mod+0 workspace number $ws10
 
 # Workspaces 11-20, with mod2
-#bindsym $mod2+1 workspace number $ws11
-#bindsym $mod2+2 workspace number $ws12
+bindsym $mod2+1 workspace number $ws11
+bindsym $mod2+2 workspace number $ws12
 bindsym $mod2+3 workspace number $ws13
 bindsym $mod2+4 workspace number $ws14
 bindsym $mod2+5 workspace number $ws15
 bindsym $mod2+6 workspace number $ws16
 bindsym $mod2+7 workspace number $ws17
 bindsym $mod2+8 workspace number $ws18
-#bindsym $mod2+9 workspace number $ws19
-#bindsym $mod2+0 workspace number $ws20
+bindsym $mod2+9 workspace number $ws19
+bindsym $mod2+0 workspace number $ws20
 
 
 # move focused container to workspace
@@ -338,7 +338,7 @@ for_window [class=.*] border normal 2
 
 # Tastenkombination für Obsidian auf der linken Hälfte und Nautilus auf der rechten Hälfte von Workspace 1
 
-bindsym $mod+Ctrl+1 exec --no-startup-id ~/little-projects/unix-shell-scripts/setUpi3WmWorkspaceNo1.sh
+bindsym $mod+Ctrl+1 exec --no-startup-id ~/.local/scripts/setUpi3WmWorkspaceNo1.sh
 
 ####################################################################################
 ####################################################################################
@@ -355,7 +355,7 @@ bindsym Ctrl+$mod+l exec "i3lock -i /home/christoph/Pictures/Wallpapers/FaustAnd
 exec "xautolock -detectsleep -time 11 -locker \"i3lock -i /home/christoph/Pictures/Wallpapers/FaustAndMephistoPPP.png\""
 
 # LOCK & SUSPEND
-bindsym $mod+Ctrl+period exec --no-startup-id ~/little-projects/unix-shell-scripts/lockAndSuspend.sh;
+bindsym $mod+Ctrl+period exec --no-startup-id ~/.local/scripts/lockAndSuspend.sh;
 
 
 ####################################################################################
@@ -383,13 +383,13 @@ bindsym $mod+Ctrl+b exec --no-startup-id blueman-manager
 bindsym $mod+Ctrl+t exec --no-startup-id telegram-desktop; workspace $wsT
 for_window [class="telegram-desktop"] move container to workspace $wsT
 
-bindsym $mod+Ctrl+w exec --no-startup-id ~/little-projects/unix-shell-scripts/whatsapp; workspace $wsW
+bindsym $mod+Ctrl+w exec --no-startup-id ~/.local/scripts/whatsapp; workspace $wsW
 for_window [class="web.whatsapp.com"] move container to workspace $wsW
 
 bindsym $mod+Ctrl+k exec --no-startup-id keepassxc; workspace $wsK
 for_window [class="KeePassXC"] move container to workspace $wsK
 
-bindsym $mod+Ctrl+m exec --no-startup-id ~/little-projects/unix-shell-scripts/teams; workspace $wsM
+bindsym $mod+Ctrl+m exec --no-startup-id ~/.local/scripts/teams; workspace $wsM
 for_window [class="teams.microsoft.com"] move container to workspace $wsK
 
 bindsym $mod+Ctrl+s exec --no-startup-id ~/.local/scripts/soundCloudSpotifyWorkspaceI3.sh
@@ -428,7 +428,8 @@ exec_always --no-startup-id xinput --set-prop "SynPS/2 Synaptics TouchPad" 'libi
 exec_always --no-startup-id xinput --set-prop "SynPS/2 Synaptics TouchPad" 'libinput Accel Speed' 1
 
 # Adjust Mousspeed
-exec_always --no-startup-id ~/little-projects/unix-shell-scripts/getMousIDAndAdjustSettings.sh 
+# TODO: Fix this Chris (25.08.2024)
+# exec_always --no-startup-id ~/little-projects/unix-shell-scripts/getMousIDAndAdjustSettings.sh 
 
 set $mod2 Mod1
 

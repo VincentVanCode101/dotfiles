@@ -1,0 +1,12 @@
+#!/bin/bash
+
+i3-msg workspace "WhatsApp"
+WINDOW_NAME="WhatsApp"
+
+if xdotool search --name "$WINDOW_NAME" windowactivate --sync; then
+  echo "window $WINDOW_NAME found and focus shifted" &>/dev/null
+else
+  google-chrome --app=https://web.whatsapp.com/ &
+fi
+
+  google-chrome --app=https://web.whatsapp.com/ &

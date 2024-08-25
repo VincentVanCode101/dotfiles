@@ -1,0 +1,20 @@
+#!/bin/bash
+
+
+xrandr --output DP-3-2 --off
+xrandr --output DP-3-3 --off
+xrandr --output HDMI-1 --off
+
+if [[ $# -eq 0 ]]; then
+    xrandr --output eDP-1 --auto --output DP-3-2 --auto --right-of eDP-1 --output HDMI-1 --auto --rotate left --right-of DP-3-2
+fi
+
+if [[ $# -eq 1 && $1 == "-u" ]]; then
+    xrandr --output eDP-1 --auto --output DP-3-2 --auto --above eDP-1 --output HDMI-1 --auto --rotate left --right-of DP-3-2
+fi
+
+if [[ $# -eq 1 && $1 == "-s" ]]; then
+    xrandr --output eDP-1 --auto --output DP-3-2 --auto --above eDP-1 --output HDMI-1 --auto --left-of DP-3-2
+fi
+
+nitrogen --restore
