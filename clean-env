@@ -12,10 +12,16 @@ do
         # Determine the target file location in the home directory
         target="$HOME/${file#$folder/}"
 
-        # Check if the target file exists and remove it
+        # Check if the target file exists and move it
         if [ -e "$target" ]; then
-            echo "Removing $target"
-            rm "$target"
+            # Generate a timestamp with underscores
+            timestamp=$(date "+%Y_%m_%d_%H:%M")
+
+            # Define the backup file name with timestamp
+            backup="${target}_${timestamp}.bak"
+
+            echo "Moving $target to $backup"
+            mv "$target" "$backup"
         fi
     done
 done
