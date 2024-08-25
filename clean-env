@@ -5,6 +5,7 @@ pushd $DOTFILES
 for folder in $(echo $STOW_FOLDERS | sed "s/,/ /g")
 do
     echo "Cleaning up files from $folder"
+    stow -D $folder
 
     # Find all files within the folder
     find $folder -type f | while read file; do
