@@ -8,4 +8,23 @@ if [[ -z $DOTFILES ]]; then
     DOTFILES=$HOME/dotfiles
 fi
 
-STOW_FOLDERS=$STOW_FOLDERS DOTFILES=$DOTFILES $DOTFILES/install
+usage() {
+    echo "Usage: $0 [--install | --clean-env]"
+    exit 1
+}
+
+if [[ $# -eq 0 ]]; then
+    usage
+fi
+
+case $1 in
+    --install)
+        STOW_FOLDERS=$STOW_FOLDERS DOTFILES=$DOTFILES $DOTFILES/install
+        ;;
+    --clean-env)
+        STOW_FOLDERS=$STOW_FOLDERS DOTFILES=$DOTFILES $DOTFILES/clean-env
+        ;;
+    *)
+        usage
+        ;;
+esac
