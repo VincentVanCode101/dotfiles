@@ -14,7 +14,6 @@ do
 
         # Check if the target file exists and move it
         if [ -e "$target" ]; then
-            # Generate a timestamp with underscores
             timestamp=$(date "+%Y_%m_%d_%H:%M")
 
             # Define the backup file name with timestamp
