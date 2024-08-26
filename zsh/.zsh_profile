@@ -18,12 +18,10 @@ alias j!="jbang"
 
 # PATH Extensions
 export PATH="$PATH:$HOME/little-projects/unix-shell-scripts"
-export PATH="$PATH:$HOME/little-projects/unix-shell-scripts"
 export PATH="$PATH:$HOME/projects/toolbox-exec"
 export PATH="$PATH:$HOME/.local/scripts"
 export PATH="$PATH:$HOME/.jbang/bin"
 
-export PATH="$PATH:/usr/local/go/bin"
 export PATH="$PATH:/usr/local/go/bin"
 
 export NVM_DIR="$HOME/.nvm"
@@ -40,21 +38,16 @@ export DOTFILES=$HOME/dotfiles
 # Custom Keyboard Shortcuts
 ######################################################################################
 
-# Connect to Container Shortcut
-connectToContainer() {
-    ~/.local/scripts/connectToContainer.sh
-}
+# Alt+e
+bindkey -s "^[e" "connectToContainer.sh\n"
 
-# Uncomment the below line if you want to enable the zle widget for connectToContainer
-# zle -N connectToContainer
-
-# Bind the connectToContainer function to Alt+e
-bindkey -s "^[e" "connectToContainer\n"
-
+# Alt+a
 bindkey -s "^[a" "gitAdd.sh\n"
 
+# Alt+g
 bindkey -s "^[g" "gitcheckoutFZF\n"
 
+# Ctrl+f
 bindkey -s ^f "tmux-sessionizer\n"
 
 ######################################################################################
