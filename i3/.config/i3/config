@@ -351,8 +351,8 @@ bindsym $mod+Ctrl+1 exec --no-startup-id ~/.local/scripts/setUpi3WmWorkspaceNo1.
 # SCREEN-LOCK
 bindsym Ctrl+$mod+l exec "i3lock -i /home/christoph/Pictures/Wallpapers/FaustAndMephistoPPP.png"
 
-# AUTO-LOCK
-exec "xautolock -detectsleep -time 11 -locker \"i3lock -i /home/christoph/Pictures/Wallpapers/FaustAndMephistoPPP.png\""
+## AUTO-LOCK
+exec "xautolock -detectsleep -time 120 -locker \"i3lock -i /home/christoph/Pictures/Wallpapers/FaustAndMephistoPPP.png\""
 
 # LOCK & SUSPEND
 bindsym $mod+Ctrl+period exec --no-startup-id ~/.local/scripts/lockAndSuspend.sh;
