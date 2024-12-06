@@ -16,6 +16,11 @@ alias amsk-whitelist-ip-dev='xdg-open https://gitlab.diva-e.com/amsk/amsk-cluste
 
 alias j!="jbang"
 
+# Functions
+#yq() {
+#  docker run --rm -i -v ${PWD}:/workdir mikefarah/yq yq $@
+#}
+
 # PATH Extensions
 export PATH="$PATH:$HOME/little-projects/unix-shell-scripts"
 export PATH="$PATH:$HOME/projects/toolbox-exec"
