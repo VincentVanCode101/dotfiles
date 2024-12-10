@@ -3,7 +3,7 @@
 # Script to interact with Philips Hue lights. Supports listing lamp details,
 # setting lamp colors, turning lamps on/off, and controlling hue, saturation, and brightness.
 #
-# Author: Bud Spencer
+# Author: Chris
 # Globals:
 #   None
 # Outputs:
