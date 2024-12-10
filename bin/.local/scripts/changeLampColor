@@ -1,0 +1,317 @@
+#!/usr/bin/env bash
+#
+# Script to interact with Philips Hue lights. Supports listing lamp details,
+# setting lamp colors, turning lamps on/off, and controlling hue, saturation, and brightness.
+#
+# Author: Bud Spencer
+# Globals:
+#   None
+# Outputs:
+#   Logs to STDOUT and STDERR
+# Returns:
+#   Non-zero exit code on error
+
+set -euo pipefail
+
+#######################################
+# Logs an error message to STDERR with a timestamp.
+# Arguments:
+#   $*: Error message
+#######################################
+err() {
+  echo "[$(date +'%Y-%m-%dT%H:%M:%S%z')]: $*" >&2
+}
+
+#######################################
+# Checks if required environment variables are set.
+# Globals:
+#   HUE_DEVELOPER_KEY
+#   HUE_BRIDGE_IP
+# Outputs:
+#   Error message to STDERR if variables are not set.
+# Returns:
+#   Exits with code 1 if variables are missing.
+#######################################
+check_env_vars() {
+  if [ -f .env ]; then
+    source .env
+  else
+    err ".env file not found! Please create a .env file with your HUE_DEVELOPER_KEY and HUE_BRIDGE_IP."
+    exit 1
+  fi
+
+  if [[ -z "${HUE_DEVELOPER_KEY:-}" || -z "${HUE_BRIDGE_IP:-}" ]]; then
+    err "HUE_DEVELOPER_KEY and HUE_BRIDGE_IP must be set in the .env file."
+    exit 1
+  fi
+}
+
+#######################################
+# Lists all available lamps with details.
+# Globals:
+#   BASE_URL
+#   HUE_DEVELOPER_KEY
+# Outputs:
+#   Lamp details (ID, on/off, reachable, color)
+#######################################
+list_lamps() {
+  local url="${BASE_URL}/${HUE_DEVELOPER_KEY}/lights"
+  local response
+
+  response=$(curl -s -X GET "${url}") || {
+    err "Failed to fetch lamp details."
+    exit 1
+  }
+
+  echo "Available lamps (ID, on/off, reachable, color):"
+  echo "${response}" | jq -r 'to_entries[] | "\(.key): on=\(.value.state.on), reachable=\(.value.state.reachable), hue=\(.value.state.hue // "N/A"), sat=\(.value.state.sat // "N/A"), bri=\(.value.state.bri // "N/A")"'
+}
+
+#######################################
+# Turns on a specified lamp.
+# Globals:
+#   BASE_URL
+#   HUE_DEVELOPER_KEY
+# Arguments:
+#   $1: Lamp number
+# Outputs:
+#   Success or error message
+#######################################
+turn_on_lamp() {
+  local lamp_number="$1"
+  local url="${BASE_URL}/${HUE_DEVELOPER_KEY}/lights/${lamp_number}/state"
+  local data='{"on":true}'
+
+  if ! curl -X PUT -H "Content-Type: application/json" -d "${data}" "${url}"; then
+    err "Failed to turn on lamp ${lamp_number}."
+    exit 1
+  fi
+
+  echo "Successfully turned on lamp ${lamp_number}."
+}
+
+#######################################
+# Turns off a specified lamp.
+# Globals:
+#   BASE_URL
+#   HUE_DEVELOPER_KEY
+# Arguments:
+#   $1: Lamp number
+# Outputs:
+#   Success or error message
+#######################################
+turn_off_lamp() {
+  local lamp_number="$1"
+  local url="${BASE_URL}/${HUE_DEVELOPER_KEY}/lights/${lamp_number}/state"
+  local data='{"on":false}'
+
+  if ! curl -X PUT -H "Content-Type: application/json" -d "${data}" "${url}"; then
+    err "Failed to turn off lamp ${lamp_number}."
+    exit 1
+  fi
+
+  echo "Successfully turned off lamp ${lamp_number}."
+}
+
+#######################################
+# Sets the entire color of a specified lamp.
+# Globals:
+#   BASE_URL
+#   HUE_DEVELOPER_KEY
+# Arguments:
+#   $1: Color name
+#   $2: Lamp number
+# Outputs:
+#   Success or error message
+#######################################
+set_color() {
+  local color="$1"
+  local lamp_number="$2"
+
+  if [[ -z "${COLORS[$color]:-}" ]]; then
+    err "Invalid color: ${color}"
+    echo "Available colors: ${!COLORS[@]}"
+    exit 1
+  fi
+
+  local url="${BASE_URL}/${HUE_DEVELOPER_KEY}/lights/${lamp_number}/state"
+  local data="${COLORS[$color]}"
+
+  if ! curl -X PUT -H "Content-Type: application/json" -d "${data}" "${url}"; then
+    err "Failed to set color ${color} for lamp ${lamp_number}."
+    exit 1
+  fi
+
+  echo "Successfully set color ${color} for lamp ${lamp_number}."
+}
+
+#######################################
+# Sets the hue of a specified lamp.
+# Globals:
+#   BASE_URL
+#   HUE_DEVELOPER_KEY
+# Arguments:
+#   $1: Lamp number
+#   $2: Hue value (0–65535)
+# Outputs:
+#   Success or error message
+#######################################
+set_hue() {
+  local lamp_number="$1"
+  local hue_value="$2"
+  local url="${BASE_URL}/${HUE_DEVELOPER_KEY}/lights/${lamp_number}/state"
+  local data="{\"hue\":${hue_value}}"
+
+  if ! curl -X PUT -H "Content-Type: application/json" -d "${data}" "${url}"; then
+    err "Failed to set hue ${hue_value} for lamp ${lamp_number}."
+    exit 1
+  fi
+
+  echo "Successfully set hue ${hue_value} for lamp ${lamp_number}."
+}
+
+#######################################
+# Sets the saturation of a specified lamp.
+# Globals:
+#   BASE_URL
+#   HUE_DEVELOPER_KEY
+# Arguments:
+#   $1: Lamp number
+#   $2: Saturation value (0–254)
+# Outputs:
+#   Success or error message
+#######################################
+set_sat() {
+  local lamp_number="$1"
+  local sat_value="$2"
+  local url="${BASE_URL}/${HUE_DEVELOPER_KEY}/lights/${lamp_number}/state"
+  local data="{\"sat\":${sat_value}}"
+
+  if ! curl -X PUT -H "Content-Type: application/json" -d "${data}" "${url}"; then
+    err "Failed to set saturation ${sat_value} for lamp ${lamp_number}."
+    exit 1
+  fi
+
+  echo "Successfully set saturation ${sat_value} for lamp ${lamp_number}."
+}
+
+#######################################
+# Sets the brightness of a specified lamp.
+# Globals:
+#   BASE_URL
+#   HUE_DEVELOPER_KEY
+# Arguments:
+#   $1: Lamp number
+#   $2: Brightness value (0–254)
+# Outputs:
+#   Success or error message
+#######################################
+set_bri() {
+  local lamp_number="$1"
+  local bri_value="$2"
+  local url="${BASE_URL}/${HUE_DEVELOPER_KEY}/lights/${lamp_number}/state"
+  local data="{\"bri\":${bri_value}}"
+
+  if ! curl -X PUT -H "Content-Type: application/json" -d "${data}" "${url}"; then
+    err "Failed to set brightness ${bri_value} for lamp ${lamp_number}."
+    exit 1
+  fi
+
+  echo "Successfully set brightness ${bri_value} for lamp ${lamp_number}."
+}
+
+#######################################
+# Main script logic.
+#######################################
+main() {
+  check_env_vars
+
+  BASE_URL="http://${HUE_BRIDGE_IP}/api"
+
+  declare -A COLORS=(
+    ["red"]='{"on":true,"sat":110,"bri":254,"hue":0}'
+    ["deep-red"]='{"on":true,"sat":254,"bri":254,"hue":0}'
+    ["green"]='{"on":true,"sat":254,"bri":254,"hue":21845}'
+    ["orange"]='{"on":true,"sat":140,"bri":254,"hue":8418}'
+    ["purple"]='{"on":true,"sat":254,"bri":254,"hue":56100}'
+    ["blue"]='{"on":true,"sat":254,"bri":254,"hue":46920}'
+    ["yellow"]='{"on":true,"sat":254,"bri":254,"hue":12750}'
+    ["cyan"]='{"on":true,"sat":254,"bri":254,"hue":32767}'
+    ["pink"]='{"on":true,"sat":254,"bri":254,"hue":56100}'
+    ["warm-white"]='{"on":true,"ct":370}'
+    ["cool-white"]='{"on":true,"ct":153}'
+  )
+
+  if [[ "$#" -eq 0 ]]; then
+    echo "Usage: $0 <command> [<args>]"
+    echo "Commands:"
+    echo "  list-lamps                   List all available lamp numbers, status, reachable state, and current color"
+    echo "  set-color <color> <lamp>     Set the entire color of a specific lamp"
+    echo "  turn-on <lamp>               Turn on a specific lamp"
+    echo "  turn-off <lamp>              Turn off a specific lamp"
+    echo "  set-hue <lamp> <hue>         Set the hue of a specific lamp (0–65535)"
+    echo "  set-sat <lamp> <saturation>  Set the saturation of a specific lamp (0–254)"
+    echo "  set-bri <lamp> <brightness>  Set the brightness of a specific lamp (0–254)"
+    exit 1
+  fi
+
+  local command="$1"
+  shift
+
+  case "${command}" in
+    list-lamps)
+      list_lamps
+      ;;
+    set-color)
+      if [[ "$#" -ne 2 ]]; then
+        err "Usage: $0 set-color <color> <lamp_number>"
+        echo "Available colors: ${!COLORS[@]}"
+        exit 1
+      fi
+      set_color "$@"
+      ;;
+    turn-on)
+      if [[ "$#" -ne 1 ]]; then
+        err "Usage: $0 turn-on <lamp_number>"
+        exit 1
+      fi
+      turn_on_lamp "$1"
+      ;;
+    turn-off)
+      if [[ "$#" -ne 1 ]]; then
+        err "Usage: $0 turn-off <lamp_number>"
+        exit 1
+      fi
+      turn_off_lamp "$1"
+      ;;
+    set-hue)
+      if [[ "$#" -ne 2 ]]; then
+        err "Usage: $0 set-hue <lamp_number> <hue_value>"
+        exit 1
+      fi
+      set_hue "$@"
+      ;;
+    set-sat)
+      if [[ "$#" -ne 2 ]]; then
+        err "Usage: $0 set-sat <lamp_number> <saturation_value>"
+        exit 1
+      fi
+      set_sat "$@"
+      ;;
+    set-bri)
+      if [[ "$#" -ne 2 ]]; then
+        err "Usage: $0 set-bri <lamp_number> <brightness_value>"
+        exit 1
+      fi
+      set_bri "$@"
+      ;;
+    *)
+      err "Invalid command: ${command}"
+      echo "Usage: $0 <command> [<args>]"
+      exit 1
+      ;;
+  esac
+}
+
+# Execute main function
+main "$@"
