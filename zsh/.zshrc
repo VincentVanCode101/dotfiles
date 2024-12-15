@@ -133,3 +133,4 @@ ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=9"
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 source ~/.zsh_profile
+eval "$(zoxide init zsh)"
