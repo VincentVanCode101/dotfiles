@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Count the number of unpushed commits since origin/HEAD
-commit_count=$(git rev-list --count HEAD ^origin/HEAD)
+commit_count=$(git rev-list --count HEAD ^origin/)
 
 # Check if there are any commits to rebase
 if [ "$commit_count" -gt 0 ]; then
