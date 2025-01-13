@@ -16,13 +16,14 @@ alias amsk-whitelist-ip-dev='xdg-open https://gitlab.diva-e.com/amsk/amsk-cluste
 
 alias j!="jbang"
 
-alias cd="z"
-
 # PATH Extensions
 export PATH="$PATH:$HOME/little-projects/unix-shell-scripts"
 export PATH="$PATH:$HOME/projects/toolbox-exec"
 export PATH="$PATH:$HOME/.local/scripts"
 export PATH="$PATH:$HOME/.jbang/bin"
+
+export PATH="$PATH:$HOME/.local/share/JetBrains/Toolbox/apps/phpstorm/bin"
+
 
 export PATH="$PATH:/usr/local/go/bin"
 
