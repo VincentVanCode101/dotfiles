@@ -1,0 +1,365 @@
+{
+    "editor.guides.bracketPairs": true,
+    "bracket-pair-colorizer-2.forceUniqueOpeningColor": true,
+    "bracket-pair-colorizer-2.highlightActiveScope": true,
+    "bracket-pair-colorizer-2.forceIterationColorCycle": true,
+    "editor.guides.bracketPairsHorizontal": true,
+    "indentRainbow.lightIndicatorStyleLineWidth": 5,
+    "indentRainbow.errorColor": "rgba(128,32,32,0.3)",
+    "editor.unicodeHighlight.invisibleCharacters": false,
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "workbench.colorTheme": "Night Owl Light",
+    "prettier.bracketSameLine": true,
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.formatOnSave": true,
+        "editor.formatOnType": true,
+        "editor.rulers": [
+            {
+                "column": 100,
+                "color": "#00d0ff"
+            }
+        ]
+    },
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "always",
+        "source.fixAll.eslint": "explicit"
+    },
+    "highlightLine.borderColor": "#cc0000",
+    "highlightLine.borderWidth": "2px",
+    "highlightLine.borderStyle": "solid",
+    "workbench.colorCustomizations": {
+        "editorRuler.foreground": "#00999922", // color of the vertical lines
+        "terminal.ansiBlue": "#095040", // uncommment for a green prompt
+        "terminal.ansiYellow": "#119072", // uncommment for a green prompt
+        "terminal.ansiBrightGreen": "#119072",
+        "terminal.ansiGreen": "#119072"
+    },
+    "editor.rulers": [
+        // 20,
+        // 40,
+        // 40,
+        // 60,
+        // 60,
+        // 60,
+        // 60,
+        // 80,
+        // 80,
+        // 80,
+        // 80,
+        // 80,
+        // 80,
+        // 80,
+        // 80,
+        // 80,
+        // 80
+    ],
+    // "editor.rulers": [
+    //   20, 40, 40, 60, 60, 60, 80, 80, 80, 80, 80, 100, 100, 100, 100, 100, 100,
+    //   100, 100, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120, 120,
+    //   120, 120
+    // ],
+    // "[ansible]": {
+    //   "editor.rulers": [
+    //     {
+    //       "column": 4,
+    //       "color": "#fd54003b"
+    //     },
+    //     {
+    //       "column": 2,
+    //       "color": "#fd54003b"
+    //     },
+    //     {
+    //       "column": 6,
+    //       "color": "#fd54003b"
+    //     },
+    //     {
+    //       "column": 8,
+    //       "color": "#fd54003b"
+    //     },
+    //     {
+    //       "column": 10,
+    //       "color": "#fd54003b"
+    //     }
+    //   ]
+    // },
+    "hediet.vscode-drawio.resizeImages": null,
+    "hediet.vscode-drawio.theme": "atlas",
+    "gitlens.views.searchAndCompare.files.layout": "tree",
+    "[json]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
+    "[vue]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    // "python.formatting.provider": "black",
+    "markdown-pdf.headerTemplate": "<div style=\"font-size: 9px; margin-left: 1cm;\"> <span class='title'></span></div> <div style=\"font-size: 9px; margin-left: auto; margin-right: 1cm; \">  <span class='xyz'></span></div>",
+    "markdown-pdf.margin.right": "1,5cm",
+    "markdown-pdf.margin.left": "1,5cm",
+    "markdown-pdf.margin.bottom": "1,5cm",
+    // Enable line breaks
+    "markdown-pdf.breaks": false,
+    // png and jpeg only. height of clipping area.
+    "markdown-pdf.clip.height": "",
+    // png and jpeg only. width of clipping area.
+    "markdown-pdf.clip.width": "",
+    // png and jpeg only. x-coordinate of top-left corner of clip area.
+    "markdown-pdf.clip.x": "",
+    // png and jpeg only. y-coordinate of top-left corner of clip area.
+    "markdown-pdf.clip.y": "",
+    // Enable Auto convert on save. To apply the settings, you need to restart Visual Studio Code
+    "markdown-pdf.convertOnSave": false,
+    // Excluded file name of convertOnSave option
+    "markdown-pdf.convertOnSaveExclude": [],
+    // pdf only. Display header and footer.
+    "markdown-pdf.displayHeaderFooter": true,
+    // Enable emoji. [Emoji cheat sheet](https://www.webfx.com/tools/emoji-cheat-sheet/)
+    "markdown-pdf.emoji": true,
+    // Path to a Chromium or Chrome executable to run instead of the bundled Chromium.
+    "markdown-pdf.executablePath": "",
+    // pdf only. HTML template for the print footer.
+    "markdown-pdf.footerTemplate": "<div style=\"font-size: 9px; margin: 0 auto;\"> <span class='pageNumber'></span> / <span class='totalPages'></span></div>",
+    // pdf only. Paper format [Letter, Legal, Tabloid, Ledger, A0, A1, A2, A3, A4, A5, A6].
+    "markdown-pdf.format": "A4",
+    // pdf only. Paper height, accepts values labeled with units(mm, cm, in, px). If it is set, it overrides the markdown-pdf.format option.
+    "markdown-pdf.height": "",
+    // Enable Syntax highlighting
+    "markdown-pdf.highlight": true,
+    // Set the style file name. [highlight.js demo](https://highlightjs.org/static/demo/) [highlight.js/src/styles](https://github.com/highlightjs/highlight.js/tree/master/src/styles)
+    "markdown-pdf.highlightStyle": "",
+    // Enable the inclusion of default Markdown styles (VSCode, markdown-pdf)
+    "markdown-pdf.includeDefaultStyles": true,
+    // Enable markdown-it-include.
+    "markdown-pdf.markdown-it-include.enable": true,
+    // mermaid server.
+    "markdown-pdf.mermaidServer": "https://unpkg.com/mermaid/dist/mermaid.min.js",
+    // png and jpeg only. Hides default white background and allows capturing screenshots with transparency.
+    "markdown-pdf.omitBackground": false,
+    // pdf only. Paper orientation. portrait or landscape.
+    "markdown-pdf.orientation": "portrait",
+    // Output Directory.
+    "markdown-pdf.outputDirectory": "",
+    // If markdown-pdf.outputDirectoryRelativePathFile option is set to true, the relative path set with markdown-pdf.styles is interpreted as relative from the file
+    "markdown-pdf.outputDirectoryRelativePathFile": false,
+    // pdf only. Paper ranges to print, e.g., '1-5, 8, 11-13'.
+    "markdown-pdf.pageRanges": "",
+    // Closing delimiter used for the plantuml parser.
+    "markdown-pdf.plantumlCloseMarker": "@enduml",
+    // Oppening delimiter used for the plantuml parser.
+    "markdown-pdf.plantumlOpenMarker": "@startuml",
+    // plantuml server
+    "markdown-pdf.plantumlServer": "http://www.plantuml.com/plantuml",
+    // pdf only. Print background graphics.
+    "markdown-pdf.printBackground": true,
+    // jpeg only. The quality of the image, between 0-100. Not applicable to png images.
+    "markdown-pdf.quality": 100,
+    // Scale of the page rendering.
+    "markdown-pdf.scale": 1,
+    // Statusbar message timeout [milliseconds]
+    "markdown-pdf.StatusbarMessageTimeout": 10000,
+    // A list of local paths to the stylesheets to use from the markdown-pdf. All '\' need to be written as '\\'.
+    "markdown-pdf.styles": [],
+    // If markdown-pdf.stylesRelativePathFile option is set to true, the relative path set with markdown-pdf.styles is interpreted as relative from the file
+    "markdown-pdf.stylesRelativePathFile": false,
+    // Output format: pdf, html, png, jpeg. Multiple output formats support
+    "markdown-pdf.type": [
+        "pdf"
+    ],
+    // pdf only. Paper width, accepts values labeled with units(mm, cm, in, px). If it is set, it overrides the markdown-pdf.format option.
+    "markdown-pdf.width": "",
+    //vim (what chris added)
+    "vscode-neovim.neovimExecutablePaths.linux": "/usr/bin/nvim",
+    "vscode-neovim.neovimInitVimPaths.linux": "$HOME/.config/nvim-vscode/init.lua",
+    //"vscode-neovim.neovimClean": true,
+    "vim.useCtrlKeys": true,
+    "vim.highlightedyank.enable": true,
+    "vim.highlightedyank.color": "rgba(228, 128,128,0.5)",
+    "vim.useSystemClipboard": false,
+    "vim.incsearch": true,
+    "vim.leader": "<space>",
+    "vim.visualModeKeyBindingsNonRecursive": [
+        {
+            "before": [
+                "<leader>",
+                "d"
+            ],
+            "after": [
+                "\"",
+                "_",
+                "d"
+            ]
+        },
+        {
+            "before": [
+                "<leader>",
+                "y"
+            ],
+            "after": [
+                "\"+",
+                "y"
+            ]
+        }
+    ],
+    "vim.normalModeKeyBindingsNonRecursive": [
+        {
+            "before": [
+                "u"
+            ],
+            "commands": [
+                "undo"
+            ]
+        },
+        {
+            "before": [
+                "<C-r>"
+            ],
+            "commands": [
+                "redo"
+            ]
+        },
+        {
+            "before": [
+                "<C-d>"
+            ],
+            "after": [
+                "<C-d>",
+                "z",
+                "z"
+            ]
+        },
+        {
+            "before": [
+                "<C-u>"
+            ],
+            "after": [
+                "<C-u>",
+                "z",
+                "z"
+            ]
+        },
+    ],
+    "vim.normalModeKeyBindings": [
+        {
+            "before": [
+                "<leader>",
+                "y"
+            ],
+            "after": [
+                "\"+",
+                "y"
+            ]
+        },
+        {
+            "before": [
+                "leader",
+                "i"
+            ],
+            "commands": [
+                "extension.toggleBool"
+            ]
+        },
+        {
+            "before": [
+                "leader",
+                "w"
+            ],
+            "commands": [
+                ":w!"
+            ]
+        },
+        {
+            "before": [
+                "leader",
+                "k"
+            ],
+            "commands": [
+                "editor.action.showHover"
+            ]
+        },
+        {
+            "before": [
+                "leader",
+                "c",
+                "a"
+            ],
+            "commands": [
+                "editor.action.quickFix"
+            ]
+        }
+    ],
+    "extensions.experimental.affinity": {
+        "vscodevim.vim": 1
+    },
+    "editor.minimap.enabled": false,
+    "files.exclude": {
+        "**/.git": false,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true
+    },
+    "explorer.confirmDelete": false,
+    "editor.fontSize": 15,
+    // "[yaml]": {
+    //   "editor.defaultFormatter": "esbenp.prettier-vscode"
+    // },
+    "[ansible]": {
+        "editor.detectIndentation": true,
+        "editor.insertSpaces": true,
+        "editor.tabSize": 2,
+        "editor.quickSuggestions": {
+            "comments": true,
+            "other": true,
+            "strings": true
+        },
+        "editor.autoIndent": "advanced"
+    },
+    "editor.fontFamily": "'JetBrains Mono', 'Droid Sans Mono','monospace',  monospace",
+    "[css]": {
+        "editor.defaultFormatter": "vscode.css-language-features"
+    },
+    "notebook.lineNumbers": "on",
+    "editor.suggest.showStatusBar": true,
+    "zenMode.hideLineNumbers": false,
+    "zenMode.centerLayout": false,
+    "terminal.integrated.env.linux": {},
+    "workbench.iconTheme": "material-icon-theme",
+    "redhat.telemetry.enabled": false,
+    "files.associations": {
+        "*.py": "python",
+        "*.yml": "yaml"
+    },
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "black-formatter.importStrategy": "fromEnvironment",
+    "[java]": {
+        "editor.defaultFormatter": "redhat.java",
+    },
+    "[jsonc]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
+    "window.zoomLevel": -1,
+    "indentRainbow.colorOnWhiteSpaceOnly": true,
+    "workbench.layoutControl.enabled": false,
+    "window.commandCenter": false,
+    "breadcrumbs.enabled": false,
+    "editor.formatOnSave": true,
+    "editor.stickyScroll.enabled": false,
+    "[php]": {
+        "editor.defaultFormatter": "bmewburn.vscode-intelephense-client"
+    },
+    "workbench.tree.indent": 18,
+    "window.menuBarVisibility": "toggle",
+    "workbench.sideBar.location": "right",
+    "find-it-faster.general.showMaximizedTerminal": true,
+    "[go]": {
+        "editor.defaultFormatter": "golang.go"
+    },
+    "explorer.confirmDragAndDrop": false,
+    "diffEditor.ignoreTrimWhitespace": false,
+    "[cpp]": {
+        "editor.defaultFormatter": "ms-vscode.cpptools"
+    }
+}
