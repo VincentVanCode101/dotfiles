@@ -1,0 +1,21 @@
+#!/bin/bash
+
+usage() {
+  echo "Usage: $0 <docker-image>"
+  echo "  <docker-image>: Name of the Docker image to scan."
+  exit 1
+}
+
+if [ $# -eq 0 ] || [ -z "$1" ]; then
+  echo "Error: No Docker image provided."
+  usage
+fi
+
+docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image "$@"
+
+if [ $? -ne 0 ]; then
+  echo "Error: Trivy scan failed."
+  exit 1
+else
+  echo "Trivy scan completed successfully."
+fi

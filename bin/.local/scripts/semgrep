@@ -1,0 +1,26 @@
+#!/bin/bash
+
+usage() {
+  echo "Usage: $0 <directory-or-file-to-scan>"
+  echo "  <directory-or-file-to-scan>: Path to the directory or file to analyze with Semgrep."
+  exit 1
+}
+
+if [ $# -eq 0 ] || [ -z "$1" ]; then
+  echo "Error: No directory or file provided."
+  usage
+fi
+
+if [ ! -e "$1" ]; then
+  echo "Error: Directory or file '$1' does not exist."
+  usage
+fi
+
+docker run --rm -v "$(pwd):/src" returntocorp/semgrep:latest semgrep --config auto "$@"
+
+if [ $? -ne 0 ]; then
+  echo "Error: Semgrep detected issues or failed to process the input."
+  exit 1
+else
+  echo "Semgrep scan completed successfully."
+fi

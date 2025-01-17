@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ISO_PATH="~/os-isos/ubuntu-22.04.4-desktop-amd64.iso"
+ISO_DIR="~/os-isos"
 
 usage() {
     echo "Usage: $0 /dev/sdX"
@@ -13,6 +13,14 @@ if [ $# -ne 1 ]; then
 fi
 
 USB_DEVICE="$1"
+
+# Collect available ISOs
+ISO_PATH=$(find ~/os-isos -maxdepth 1 -type f -name "*.iso" | fzf --prompt="Select the ISO to flash: ")
+
+if [ -z "$ISO_PATH" ]; then
+    echo "No ISO selected. Aborted."
+    exit 3
+fi
 
 echo "You are about to completely erase and write $ISO_PATH to $USB_DEVICE."
 read -p "Are you sure you want to continue? This will erase all data on $USB_DEVICE! (y/N): " CONFIRM

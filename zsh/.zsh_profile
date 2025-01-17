@@ -38,25 +38,6 @@ export NVM_DIR="$HOME/.nvm"
 #  docker run --rm -i -v ${PWD}:/workdir mikefarah/yq yq $@
 #}
 
-gitleaks() {
-    docker run -v .:/path zricethezav/gitleaks:latest detect --source="/path" -v -r gitleaks.json
-}
-
-hadolint() {
-    docker run --rm -i hadolint/hadolint < $@
-}
-
-shellcheck() {
-    docker run --rm -v "$(pwd)":/mnt koalaman/shellcheck:latest $@
-}
-
-trivy() {
-    docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image $@
-}
-
-semgrep() {
-    docker run --rm -v "$(pwd):/src" returntocorp/semgrep:latest semgrep --config auto $@
-}
 
 # Others
 export DOTFILES=$HOME/dotfiles

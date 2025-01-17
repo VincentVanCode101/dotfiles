@@ -1,0 +1,26 @@
+#!/bin/bash
+
+usage() {
+  echo "Usage: $0 <script-to-check>"
+  echo "  <script-to-check>: Path to the shell script to check."
+  exit 1
+}
+
+if [ $# -eq 0 ] || [ -z "$1" ]; then
+  echo "Error: No file provided."
+  usage
+fi
+
+if [ ! -f "$1" ]; then
+  echo "Error: File '$1' does not exist."
+  usage
+fi
+
+docker run --rm -v "$(pwd)":/mnt koalaman/shellcheck:latest "$@"
+
+if [ $? -ne 0 ]; then
+  echo "Error: ShellCheck detected issues in the script."
+  exit 1
+else
+  echo "ShellCheck completed successfully."
+fi
