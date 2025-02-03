@@ -10,10 +10,15 @@ if [ -z "$selected_container" ]; then
 fi
 
 container_id=$(echo "$selected_container" | awk '{print $1}')
+container_name=$(echo "$selected_container" | awk '{print $2}')
 
-if docker exec "$container_id" which bash > /dev/null 2>&1; then
+if [ -n "$TMUX" ]; then
+    tmux rename-window "C: $container_name"
+fi
+
+if docker exec "$container_id" which bash >/dev/null 2>&1; then
     docker exec -it "$container_id" bash
-elif docker exec "$container_id" which sh > /dev/null 2>&1; then
+elif docker exec "$container_id" which sh >/dev/null 2>&1; then
     docker exec -it "$container_id" sh
 else
     echo "Failed to connect to container. Neither bash nor sh is available."
