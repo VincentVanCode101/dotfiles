@@ -22,9 +22,12 @@ log_pull() {
 # Trap any error and log it before exiting.
 trap 'log_error "Error on line ${LINENO}: Command '\''$BASH_COMMAND'\'' exited with status $?"' ERR
 
-# Change to the directory where this script is located.
-cd "$(dirname "$0")" || {
-    log_error "Could not change directory to script location."
+# Define the target directory where git operations should occur.
+TARGET_DIR="/home/christoph/personal/notes/second-brain"
+
+# Change to the target directory.
+cd "$TARGET_DIR" || {
+    log_error "Could not change directory to $TARGET_DIR."
     exit 1
 }
 
