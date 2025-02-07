@@ -12,7 +12,7 @@
 #   2. Updates the config to:
 #         - Use the desired local sync directory.
 #         - Exclude directories named ".git" or "temp".
-#   3. Creates a user-level systemd service to run OneDrive in monitor mode.
+#   3. Creates a user-level systemd service to run OneDrive in monitor mode with --resync-auth.
 #   4. Reloads systemd and enables/starts the OneDrive service.
 #
 # Usage: ./onedrive-setup.sh
@@ -66,7 +66,7 @@ Description=OneDrive Client for Linux (Monitor Mode)
 After=network-online.target
 
 [Service]
-ExecStart=/usr/bin/onedrive --monitor
+ExecStart=/usr/bin/onedrive --monitor --resync-auth
 Restart=on-failure
 
 [Install]
@@ -88,6 +88,6 @@ systemctl --user start onedrive
 
 echo "==> OneDrive setup complete!"
 echo "Local sync directory is set to: $LOCAL_SYNC_DIR"
-echo "The OneDrive client is now running in monitor mode and will continuously sync changes bidirectionally."
+echo "The OneDrive client is now running in monitor mode (with --resync-auth) and will continuously sync changes bidirectionally."
 echo "To check the status at any time, run:"
 echo "  systemctl --user status onedrive.service"
