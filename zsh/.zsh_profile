@@ -12,6 +12,9 @@ alias bat="batcat"
 alias asdf="setxkbmap de-chris"
 alias yxcv="setxkbmap de"
 
+alias copy='xclip -selection clipboard'
+alias paste='xclip -selection clipboard -o'
+
 alias amsk-whitelist-ip-dev='xdg-open https://gitlab.diva-e.com/amsk/amsk-cluster/amsk-cluster-api-whitelist/-/pipelines/new?var[IP]=$(curl -s ipinfo.io/ip)'
 
 alias j!="jbang"
@@ -24,7 +27,6 @@ export PATH="$PATH:$HOME/.jbang/bin"
 
 export PATH="$PATH:$HOME/.local/share/JetBrains/Toolbox/apps/phpstorm/bin"
 
-
 export PATH="$PATH:/usr/local/go/bin"
 
 export NVM_DIR="$HOME/.nvm"
@@ -32,12 +34,17 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
+######################################################################################
+# Custom Functions
+######################################################################################
 
-# Functions
 #yq() {
 #  docker run --rm -i -v ${PWD}:/workdir mikefarah/yq yq $@
 #}
 
+mkcd() {
+  mkdir -p "$1" && cd "$1"
+}
 
 # Others
 export DOTFILES=$HOME/dotfiles
@@ -72,7 +79,6 @@ if [[ $FIND_IT_FASTER_ACTIVE -eq 1 ]]; then
   FZF_DEFAULT_OPTS='--height=70%'
 fi
 
-
 # Powerlevel10k Prompt Customization
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
@@ -83,5 +89,3 @@ fi
 ######################################################################################
 # End of .zsh_profile
 ######################################################################################
-
-
