@@ -72,6 +72,7 @@ pull_remote_if_needed() {
 # - If an event is detected, waits briefly (debounce) then commits & pushes local changes.
 # - If the timeout expires (no local changes), it checks for remote updates.
 while true; do
+    log_info $(pwd)
     if inotifywait -r -e modify,create,delete,move -t 60 .; then
         sleep 10 # Debounce: wait for rapid changes to settle.
         commit_and_push
