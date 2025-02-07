@@ -19,7 +19,6 @@ log_pull() {
     log_info "Pulled remote changes"
 }
 
-# Trap any error and log it before exiting.
 trap 'log_error "Error on line ${LINENO}: Command '\''$BASH_COMMAND'\'' exited with status $?"' ERR
 
 # Define the target directory where git operations should occur.
