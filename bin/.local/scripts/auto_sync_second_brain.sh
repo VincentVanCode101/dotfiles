@@ -22,8 +22,9 @@ log_pull() {
 # Trap any error and log it before exiting.
 trap 'log_error "Error on line ${LINENO}: Command '\''$BASH_COMMAND'\'' exited with status $?"' ERR
 
-# Change to the directory where this script is located.
-cd "$(dirname "$0")" || {
+TARGET_DIR="/home/christoph/personal/notes/second-brain"
+
+cd "$TARGET_DIR" || {
     log_error "Could not change directory to script location."
     exit 1
 }
