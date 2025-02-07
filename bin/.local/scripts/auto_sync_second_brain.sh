@@ -19,14 +19,12 @@ log_pull() {
     log_info "Pulled remote changes"
 }
 
+# Trap any error and log it before exiting.
 trap 'log_error "Error on line ${LINENO}: Command '\''$BASH_COMMAND'\'' exited with status $?"' ERR
 
-# Define the target directory where git operations should occur.
-TARGET_DIR="/home/christoph/personal/notes/second-brain"
-
-# Change to the target directory.
-cd "$TARGET_DIR" || {
-    log_error "Could not change directory to $TARGET_DIR."
+# Change to the directory where this script is located.
+cd "$(dirname "$0")" || {
+    log_error "Could not change directory to script location."
     exit 1
 }
 
@@ -72,7 +70,6 @@ pull_remote_if_needed() {
 # - If an event is detected, waits briefly (debounce) then commits & pushes local changes.
 # - If the timeout expires (no local changes), it checks for remote updates.
 while true; do
-    log_info $(pwd)
     if inotifywait -r -e modify,create,delete,move -t 60 .; then
         sleep 10 # Debounce: wait for rapid changes to settle.
         commit_and_push
