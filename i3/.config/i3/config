@@ -364,9 +364,8 @@ bindsym $mod+Ctrl+period exec --no-startup-id ~/.local/scripts/lockAndSuspend.sh
 ####################################################################################
 ####################################################################################
 
-bindsym $mod+n exec --no-startup-id ~/.local/scripts/notes.sh "$HOME/personal/notes/secondBrain"
+bindsym $mod+n exec --no-startup-id ~/.local/scripts/notes.sh "$HOME/personal/notes/second-brain"
 bindsym $mod+shift+n exec --no-startup-id ~/.local/scripts/notes.sh "$HOME/work/notes"
-#exec_always --no-startup-id ~/.local/scripts/notes.sh "$HOME/personal/notes/secondBrain"
 for_window [title=".*nvim /home/christoph/.*/notes.*"] floating enable
 #for_window [title=".*nvim /home/christoph/.*/notes.*"] move to scratchpad
 
