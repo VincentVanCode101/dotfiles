@@ -36,7 +36,7 @@ BRANCH=$(git symbolic-ref --short HEAD 2>/dev/null || echo "main")
 commit_and_push() {
     if [ -n "$(git status --porcelain)" ]; then
         git add -A
-        if git commit -m "Auto commit on $(date)"; then
+        if git commit -m "Auto commit from $(uname -n) ($(date +"%a., %d %b. %Y %H:%M:%S %z"))"; then
             if git push origin "$BRANCH"; then
                 log_push
             else
