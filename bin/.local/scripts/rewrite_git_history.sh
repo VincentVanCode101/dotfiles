@@ -18,7 +18,7 @@ fi
 
 # Extract the commit hash from the selected line (assumes the hash is the first token).
 commit_hash=$(echo "$commit_line" | awk '{print $1}')
-commit_date=$(echo "$commit_line" | awk '{print $2}')
+commit_date=$(echo $commit_line | awk '{print $2 " " $3}')
 echo "Selected commit: $commit_hash ($commit_date)"
 
 # Prompt for the new date/time components.
