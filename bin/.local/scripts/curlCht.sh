@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -Eeou pipefail
 selected=$(cat ~/.tmux-cht-languages ~/.tmux-cht-command | fzf)
 if [[ -z $selected ]]; then
     exit 0
@@ -14,4 +15,3 @@ else
     response=$(curl -s "cht.sh/$selected")
     echo -e "$response" | less
 fi
-
