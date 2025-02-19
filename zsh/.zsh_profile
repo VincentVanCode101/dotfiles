@@ -14,6 +14,7 @@ alias yxcv="setxkbmap de"
 
 alias copy='xclip -selection clipboard'
 alias paste='xclip -selection clipboard -o'
+alias linebreaks="sed 's/\\n/\n/g'"
 
 alias amsk-whitelist-ip-dev='xdg-open https://gitlab.diva-e.com/amsk/amsk-cluster/amsk-cluster-api-whitelist/-/pipelines/new?var[IP]=$(curl -s ipinfo.io/ip)'
 
