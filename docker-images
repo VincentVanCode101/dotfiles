@@ -5,3 +5,4 @@ aquasec/trivy:latest
 returntocorp/semgrep:latest
 mysql:8.0
 node:19-slim
+ollama/ollama:latest
