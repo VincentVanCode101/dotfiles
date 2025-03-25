@@ -98,6 +98,12 @@ plugins=(
   zsh-autosuggestions
 )
 
+# Inside tmux? Get the shared agent socket
+if [ -n "$TMUX" ]; then
+    export SSH_AUTH_SOCK=$(tmux show-environment SSH_AUTH_SOCK 2>/dev/null | cut -d= -f2-)
+fi
+
+
 source $ZSH/oh-my-zsh.sh
 
 
