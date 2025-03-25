@@ -331,7 +331,8 @@
     "files.associations": {
         "*.py": "python",
         "*.yml": "yaml",
-        ".env": "dotenv"
+        ".env": "dotenv",
+        "*.conf": "plaintext"
     },
     "editor.defaultFormatter": "ms-python.black-formatter",
     "black-formatter.importStrategy": "fromEnvironment",
@@ -352,7 +353,6 @@
         "editor.defaultFormatter": "bmewburn.vscode-intelephense-client"
     },
     "workbench.tree.indent": 18,
-    "window.menuBarVisibility": "toggle",
     "workbench.sideBar.location": "right",
     "find-it-faster.general.showMaximizedTerminal": true,
     "[go]": {
@@ -377,5 +377,7 @@
     },
     "[properties]": {
         "editor.defaultFormatter": "foxundermoon.shell-format"
-    }
+    },
+    "window.menuBarVisibility": "toggle",
+    "editor.renderWhitespace": "all",
 }
