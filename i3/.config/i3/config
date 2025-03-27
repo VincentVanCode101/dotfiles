@@ -378,7 +378,8 @@ bindsym $mod+Ctrl+g exec --no-startup-id google-chrome
 
 bindsym $mod+Ctrl+f exec --no-startup-id firefox
 
-bindsym $mod+Ctrl+c exec --no-startup-id gnome-control-center
+bindsym $mod+Ctrl+c exec --no-startup-id env XDG_CURRENT_DESKTOP=GNOME gnome-control-center
+
 bindsym $mod+Ctrl+b exec --no-startup-id blueman-manager
 
 
