@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+readonly commandToTestFor=$1
+
+while IFS= read -r line; do
+    container_id=$(echo "$line" | awk '{print $1}')
+    container_name=$(echo "$line" | awk '{print $2}')
+
+    if docker exec "$container_id" "$commandToTestFor" -v >/dev/null 2>&1; then
+        echo "✅ Command '$commandToTestFor' FOUND in container $container_name ($container_id)"
+    else
+        echo "❌ Command '$commandToTestFor' NOT found in container $container_name ($container_id)"
+    fi
+done < <(docker ps --format '{{.ID}} {{.Names}}')
