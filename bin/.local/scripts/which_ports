@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+docker ps -q | xargs -n1 docker inspect --format '{{range $p, $conf := .NetworkSettings.Ports}}{{if $conf}}{{$p}} -> {{(index $conf 0).HostIp}}:{{(index $conf 0).HostPort}}{{"\n"}}{{end}}{{end}}' | grep -v '^$'
