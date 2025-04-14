@@ -10,7 +10,6 @@
     "[javascript]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
-    "workbench.colorTheme": "Night Owl Light",
     "prettier.bracketSameLine": true,
     "[python]": {
         "editor.defaultFormatter": "ms-python.black-formatter",
@@ -290,7 +289,8 @@
         }
     ],
     "extensions.experimental.affinity": {
-        "vscodevim.vim": 1
+        "vscodevim.vim": 1,
+        "asvetliakov.vscode-neovim": 1
     },
     "editor.minimap.enabled": false,
     "files.exclude": {
@@ -302,7 +302,7 @@
         "**/Thumbs.db": true
     },
     "explorer.confirmDelete": false,
-    "editor.fontSize": 15,
+    "editor.fontSize": 17,
     // "[yaml]": {
     //   "editor.defaultFormatter": "esbenp.prettier-vscode"
     // },
@@ -380,4 +380,6 @@
     },
     "window.menuBarVisibility": "toggle",
     "editor.renderWhitespace": "all",
+    "workbench.colorTheme": "Night Owl Light",
+    "security.workspace.trust.untrustedFiles": "open",
 }

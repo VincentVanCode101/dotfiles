@@ -1,2 +1,13 @@
-.code
+.vscode
 .idea
+
+# Ignore everything in the code directory
+code/**
+
+# But not this specific file
+!code/.config/Code/User/settings.json
+
+# Ensure parent directories are not ignored
+!code/.config/
+!code/.config/Code/
+!code/.config/Code/User/
