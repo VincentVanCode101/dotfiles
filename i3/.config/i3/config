@@ -254,7 +254,8 @@ bar {
 	output DP-2-2
 	output HDMI-1
 	tray_output DP-3-3 
-	font pango:DejaVu Sans Mono 10
+	#font pango:DejaVu Sans Mono 10
+        font pango: JetBrains Mono Regular, JetBrains Mono Light 10
 	separator_symbol |
 	}
 
@@ -264,7 +265,8 @@ bar {
 	position top
 	output primary
 	#tray_output none
-	font pango:DejaVu Sans Mono 11
+	#font pango:DejaVu Sans Mono 11
+        font pango: JetBrains Mono Regular, JetBrains Mono Light 11
 	separator_symbol |
 	}
 
@@ -289,7 +291,9 @@ bindsym $mod+Ctrl+d exec i3-dmenu-desktop
 
 # font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
 # font paggo: JetBrains Mono 13
- font pango:JetBrainsMono 9, DejaVu Sans Mono 10
+# font pango:JetBrainsMono 9, DejaVu Sans Mono 10
+font pango:JetBrains Mono Regular, JetBrains Mono Light 11
+
 #font pango:DejaVu Sans Mono, Terminus Bold Semi-Condensed 8
 # font pango:Terminus 8px
 
