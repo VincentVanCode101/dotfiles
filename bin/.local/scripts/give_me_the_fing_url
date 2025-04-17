@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
+
+get_git_url() {
+    git remote get-url origin 2>/dev/null ||
+        git config --get remote.origin.url 2>/dev/null
+}
+
+if GIT_URL=$(get_git_url); then
+    echo "https://"${GIT_URL##git@}
+else
+    echo "❌ Not inside a Git repo (or no origin remote configured)" >&2
+    exit 1
+fi
