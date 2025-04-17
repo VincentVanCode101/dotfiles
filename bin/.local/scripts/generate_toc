@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+# generate_toc.sh
+# Usage: ./generate_toc.sh [-o|--obsidian] file1.md [file2.md …]
+set -euo pipefail
+
+usage() {
+    cat <<EOF
+Usage: $0 [-o|--obsidian] <markdown-file> [more-markdown-files…]
+
+  -o, --obsidian   output Obsidian-style wiki-links
+EOF
+    exit 1
+}
+
+# default mode
+MODE="markdown"
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+    -o | --obsidian)
+        MODE="obsidian"
+        shift
+        ;;
+    -*) usage ;;
+    *) break ;;
+    esac
+done
+[ $# -ge 1 ] || usage
+
+for file in "$@"; do
+    note=$(basename "$file" .md)
+
+    # Build an array of all heading‐levels present, then pick the minimum
+    mapfile -t levels < <(
+        grep -E '^(#{1,6}) ' "$file" |
+            sed -E 's/^(#{1,6}).*/\1/' |
+            awk '{print length}'
+    )
+    # If no headings, skip
+    if [ ${#levels[@]} -eq 0 ]; then
+        echo "No headings found in $file" >&2
+        continue
+    fi
+    min_level=$(printf '%s\n' "${levels[@]}" | sort -n | head -1)
+
+    if [ "$MODE" = "markdown" ]; then
+        echo
+        echo "## **Table of Contents**"
+        echo
+    else
+        echo
+        echo "**Obsidian TOC for ${note}.md**"
+        echo
+    fi
+
+    grep -E '^(#{1,6}) ' "$file" |
+        sed -E 's/^(#{1,6})[[:space:]]+(.*)/\1|\2/' |
+        while IFS="|" read -r hashes title; do
+            level=${#hashes}
+
+            # Top‐level (min_level) → no indent; deeper → indent = level−min_level
+            if [ "$level" -le "$min_level" ]; then
+                indent_levels=0
+            else
+                indent_levels=$((level - min_level))
+            fi
+
+            if [ "$MODE" = "markdown" ]; then
+                # two spaces per indent level
+                indent=$(printf '%*s' $((indent_levels * 2)) '')
+                # GitHub‑style anchor
+                anchor=$(printf '%s' "$title" |
+                    tr '[:upper:]' '[:lower:]' |
+                    sed -E 's/[^a-z0-9 -]//g' |
+                    sed -E 's/[[:space:]]+/-/g')
+                printf '%s- [%s](#%s)\n' "$indent" "$title" "$anchor"
+
+            else
+                # one literal tab (\t) per indent level
+                tab=$'\t'
+                indent=""
+                for ((i = 0; i < indent_levels; i++)); do indent+="$tab"; done
+                printf '%s* [[%s#%s|%s]]\n' \
+                    "$indent" "$note" "$title" "$title"
+            fi
+        done
+
+    echo
+done
