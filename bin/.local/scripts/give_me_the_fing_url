@@ -2,14 +2,32 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-get_git_url() {
-    git remote get-url origin 2>/dev/null ||
-        git config --get remote.origin.url 2>/dev/null
-}
+# Usage: ./script.sh [remote-name]
+remote=${1:-origin}
 
-if GIT_URL=$(get_git_url); then
-    echo "https://"${GIT_URL##git@}
-else
-    echo "❌ Not inside a Git repo (or no origin remote configured)" >&2
+# 1. Fetch the remote URL (SSH or HTTPS)
+if ! remote_url=$(git config --get remote."$remote".url 2>/dev/null); then
+    echo "❌ No remote named '$remote' found." >&2
     exit 1
 fi
+
+# 2. Transform to HTTPS
+case "$remote_url" in
+# SSH style: git@host:owner/repo.git
+git@*:*)
+    # Split “git@host:path” into host and path
+    host=${remote_url#git@} # host:path.git
+    host=${host%%:*}        # host
+    path=${remote_url#*:}   # owner/repo.git
+    https_url="https://${host}/${path}"
+    ;;
+http://* | https://*)
+    https_url="$remote_url"
+    ;;
+*)
+    echo "❌ Unsupported URL format: $remote_url" >&2
+    exit 1
+    ;;
+esac
+
+echo "$https_url"
