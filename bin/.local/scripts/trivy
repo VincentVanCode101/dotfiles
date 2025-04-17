@@ -1,12 +1,23 @@
 #!/usr/bin/env bash
 set -euo pipefail
+IFS=$'\n\t'
 
-# where to keep Trivy's DB cache on the host
+# Where to keep Trivy's DB cache on the host
 CACHE_DIR="${TRIVY_CACHE_DIR:-$HOME/.cache/trivy}"
 mkdir -p "$CACHE_DIR"
 
-docker run --rm \
-  -v /var/run/docker.sock:/var/run/docker.sock \
-  -v "$CACHE_DIR":/root/.cache/trivy \
-  aquasec/trivy:latest \
-  "$@"
+# If the subcommand is "filesystem", mount the CWD so Trivy can see local files
+if [[ "${1:-}" == "filesystem" ]]; then
+  docker run --rm \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    -v "$CACHE_DIR":/root/.cache/trivy \
+    -v "$(pwd)":/project \
+    -w /project \
+    aquasec/trivy:latest "$@"
+else
+  # All other Trivy subcommands (image, config, secret, etc.)
+  docker run --rm \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    -v "$CACHE_DIR":/root/.cache/trivy \
+    aquasec/trivy:latest "$@"
+fi
