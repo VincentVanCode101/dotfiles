@@ -1,21 +1,121 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
+
+# Default configuration
+CACHE_DIR="${TRIVY_CACHE_DIR:-$HOME/.cache/trivy}"
+TRIVY_IMAGE="aquasec/trivy:latest"
+SEVERITIES=""              # empty = all severities (UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL)
+IGNORE_FILE=".trivyignore" # list of CVEs to skip
+OUTPUT_FORMAT="table"      # options: table, json, sarif, template…
+OUTPUT_FILE=""             # e.g. scan-results.json
+EXIT_CODE=1                # non-zero if vuln ≥ severity
 
 usage() {
-  echo "Usage: $0 <docker-image>"
-  echo "  <docker-image>: Name of the Docker image to scan."
+  cat <<EOF
+Usage: $0 [options] <docker-image>
+
+Options:
+  -c, --cache-dir DIR       Trivy cache directory (default: $CACHE_DIR)
+  -s, --severities LIST     Comma-separated severities to report (default: all)
+  -i, --ignore-file FILE    Path to .trivyignore (default: $IGNORE_FILE)
+  -f, --format FORMAT       Output format: table, json, sarif, template (default: $OUTPUT_FORMAT)
+  -o, --output-file FILE    Write output to FILE instead of stdout
+  -e, --exit-code INT       Exit code if vulns found at/above severities (default: $EXIT_CODE)
+  -h, --help                This help message
+EOF
   exit 1
 }
 
-if [ $# -eq 0 ] || [ -z "$1" ]; then
-  echo "Error: No Docker image provided."
+# parse options
+while (($#)); do
+  case "$1" in
+  -c | --cache-dir)
+    CACHE_DIR="$2"
+    shift 2
+    ;;
+  -s | --severities)
+    SEVERITIES="$2"
+    shift 2
+    ;;
+  -i | --ignore-file)
+    IGNORE_FILE="$2"
+    shift 2
+    ;;
+  -f | --format)
+    OUTPUT_FORMAT="$2"
+    shift 2
+    ;;
+  -o | --output-file)
+    OUTPUT_FILE="$2"
+    shift 2
+    ;;
+  -e | --exit-code)
+    EXIT_CODE="$2"
+    shift 2
+    ;;
+  -h | --help) usage ;;
+  --)
+    shift
+    break
+    ;;
+  -*)
+    echo "Unknown option: $1" >&2
+    usage
+    ;;
+  *)
+    IMAGE="$1"
+    shift
+    break
+    ;;
+  esac
+done
+
+if [ -z "${IMAGE:-}" ]; then
+  echo "Error: No Docker image provided." >&2
   usage
 fi
 
-docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image "$@"
+# ensure cache dir exists
+mkdir -p "$CACHE_DIR"
 
-if [ $? -ne 0 ]; then
-  echo "Error: Trivy scan failed."
-  exit 1
+# build docker run args
+DOCKER_ARGS=(
+  --rm
+  -v /var/run/docker.sock:/var/run/docker.sock
+  -v "$CACHE_DIR":/root/.cache/trivy # --cache-dir: stores Trivy's vulnerability DB here
+)
+
+# add ignore file if present
+if [ -f "$IGNORE_FILE" ]; then
+  DOCKER_ARGS+=(-v "$(realpath "$IGNORE_FILE")":/tmp/.trivyignore)
+  IGNORE_OPT="--ignorefile /tmp/.trivyignore"
 else
-  echo "Trivy scan completed successfully."
+  IGNORE_OPT=""
 fi
+
+# output redirection
+if [ -n "$OUTPUT_FILE" ]; then
+  OUTPUT_OPT="--output $OUTPUT_FILE"
+else
+  OUTPUT_OPT=""
+fi
+
+# assemble severity flag only if specified
+if [ -n "$SEVERITIES" ]; then
+  SEV_OPT="--severity $SEVERITIES"
+else
+  SEV_OPT="" # no --severity flag = report ALL severities by default
+fi
+
+docker run "${DOCKER_ARGS[@]}" "$TRIVY_IMAGE" \
+  image \
+  --cache-dir /root/.cache/trivy \
+  $SEV_OPT \
+  $IGNORE_OPT \
+  --format "$OUTPUT_FORMAT" \
+  $OUTPUT_OPT \
+  --exit-code "$EXIT_CODE" \
+  "$IMAGE"
+
+echo "✅ Trivy scan completed."
