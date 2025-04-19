@@ -332,7 +332,8 @@
         "*.py": "python",
         "*.yml": "yaml",
         ".env": "dotenv",
-        "*.conf": "plaintext"
+        "*.conf": "plaintext",
+        "*.rmd": "markdown"
     },
     "editor.defaultFormatter": "ms-python.black-formatter",
     "black-formatter.importStrategy": "fromEnvironment",
