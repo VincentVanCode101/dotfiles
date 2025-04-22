@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+if [[ $# -ne 1 ]]; then
+    echo "Usage: $0 filename.tex"
+    exit 1
+fi
+
+INPUT="$1"
+
+if [[ "$INPUT" != *.tex ]]; then
+    echo "Error: Input file must have a .tex extension."
+    echo "Usage: $0 filename.tex"
+    exit 1
+fi
+
+BASENAME="${INPUT%.tex}"
+
+for cmd in latex dvipng; do
+    if ! command -v "$cmd" &>/dev/null; then
+        echo "Error: '$cmd' is not installed or not in PATH."
+        exit 1
+    fi
+done
+
+if [[ ! -f "$INPUT" ]]; then
+    echo "Error: File '$INPUT' not found."
+    exit 1
+fi
+
+if latex "$INPUT" &&
+    dvipng -D 500 -T tight -bg Transparent -o "${BASENAME}.png" "${BASENAME}.dvi"; then
+    rm -f "${BASENAME}.aux" "${BASENAME}.log" "${BASENAME}.dvi"
+    echo "Success: '${BASENAME}.png' created."
+else
+    echo "Error during LaTeX or PNG conversion."
+    exit 1
+fi
