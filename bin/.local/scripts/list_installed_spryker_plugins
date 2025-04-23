@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+find vendor/spryker -name "*Plugin.php"

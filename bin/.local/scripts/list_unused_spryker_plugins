@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+comm -23 \
+    <(find vendor/spryker -name "*Plugin.php" | sed 's|.*/||' | sort) \
+    <(grep -R "new .*Plugin" src/Pyz/Zed/ | sed -E 's/.*new ([^ ;()]*).*/\1.php/' | sort | uniq)
