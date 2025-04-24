@@ -1,2 +1,6 @@
 #!/usr/bin/env bash
-docker ps -q | xargs -n1 docker inspect --format '{{range $p, $conf := .NetworkSettings.Ports}}{{if $conf}}{{$p}} -> {{(index $conf 0).HostIp}}:{{(index $conf 0).HostPort}}{{"\n"}}{{end}}{{end}}' | grep -v '^$'
+
+docker ps -q | while read cid; do
+    cname=$(docker inspect --format '{{.Name}}' "$cid" | sed 's|^/||')
+    docker inspect --format '{{range $p, $conf := .NetworkSettings.Ports}}{{if $conf}}'"$cname"' {{$p}} -> {{(index $conf 0).HostIp}}:{{(index $conf 0).HostPort}}{{"\n"}}{{end}}{{end}}' "$cid"
+done | awk 'NF'
