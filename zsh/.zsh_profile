@@ -43,6 +43,9 @@ case ":$PATH:" in
 esac
 # pnpm end
 
+alias dive="docker run -ti --rm  -v /var/run/docker.sock:/var/run/docker.sock docker.io/wagoodman/dive"
+alias dfimage="docker run -v /var/run/docker.sock:/var/run/docker.sock --rm alpine/dfimage"
+
 ######################################################################################
 # Custom Functions
 ######################################################################################
