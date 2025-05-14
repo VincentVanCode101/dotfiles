@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# select container with fuzzy finder
+selection=$(docker ps --format "{{.ID}}\t{{.Names}}\t{{.Image}}" |
+    fzf --header "Select a container" --preview "docker logs --tail 10 {1}")
+
+[[ -z "$selection" ]] && exit 1
+
+# extract container ID
+container_id=$(awk '{print $1}' <<<"$selection")
+
+# prompt for path
+read -e -p "Path in container to copy: " image_path
+[[ -z "$image_path" ]] && exit 1
+
+# copy to current dir
+basename=$(basename "${image_path%/}")
+docker cp "$container_id:$image_path" "./$basename"
