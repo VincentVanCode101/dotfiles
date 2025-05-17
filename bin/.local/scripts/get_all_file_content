@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
-find . -maxdepth 1 -type f ! \( -iname "*.pdf" -o -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.gif" -o -iname "*.zip" -o -iname "*.tar" -o -iname "*.gz" \) -print0 | while IFS= read -r -d '' file; do
+MAX_DEPTH=${1:-1}
+
+echo "$MAX_DEPTH"
+
+find . -maxdepth $MAX_DEPTH -type f ! \( -iname "*.pdf" -o -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.gif" -o -iname "*.zip" -o -iname "*.tar" -o -iname "*.gz" \) -print0 | while IFS= read -r -d '' file; do
     echo "${file##./}:"
     cat "$file"
     echo -e "\n"
