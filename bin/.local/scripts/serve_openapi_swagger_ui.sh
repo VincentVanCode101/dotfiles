@@ -84,7 +84,7 @@ validate_inputs() {
 #   The container ID.
 #######################################
 run_docker() {
-    docker run -d \
+    docker run \
         -p "${PORT}:8080" \
         -e "SWAGGER_JSON=/tmp/${OPENAPI_BASE}" \
         -v "${OPENAPI_DIR}:/tmp" \
@@ -106,10 +106,8 @@ main() {
     validate_inputs "$@"
 
     echo "Starting Docker container with Swagger UI..."
-    container_id=$(run_docker)
-
     echo "Serving ${OPENAPI_ABS_PATH} on http://localhost:${PORT}"
-    echo "Container ID: ${container_id}"
+    container_id=$(run_docker)
 }
 
 main "$@"
