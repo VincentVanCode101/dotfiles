@@ -272,7 +272,8 @@ bar {
 	separator_symbol |
 	}
 
-
+#TODO: maybe get polybar to work
+#exec_always --no-startup-id ~/.config/polybar/launch.sh
 
 
 # WHAT CHRISTOPH ADDED

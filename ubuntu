@@ -1,7 +1,7 @@
 #!/usr/bin/env zsh
 
 if [[ -z $STOW_FOLDERS ]]; then
-    STOW_FOLDERS="zsh,i3,nvim,tmux,bin,code"
+    STOW_FOLDERS="zsh,i3,nvim,tmux,bin,code,polybar"
 fi
 
 if [[ -z $DOTFILES ]]; then
@@ -18,13 +18,13 @@ if [[ $# -eq 0 ]]; then
 fi
 
 case $1 in
-    --install)
-        STOW_FOLDERS=$STOW_FOLDERS DOTFILES=$DOTFILES $DOTFILES/install
-        ;;
-    --clean-env)
-        STOW_FOLDERS=$STOW_FOLDERS DOTFILES=$DOTFILES $DOTFILES/clean-env
-        ;;
-    *)
-        usage
-        ;;
+--install)
+    STOW_FOLDERS=$STOW_FOLDERS DOTFILES=$DOTFILES $DOTFILES/install
+    ;;
+--clean-env)
+    STOW_FOLDERS=$STOW_FOLDERS DOTFILES=$DOTFILES $DOTFILES/clean-env
+    ;;
+*)
+    usage
+    ;;
 esac
