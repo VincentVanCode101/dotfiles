@@ -6,5 +6,5 @@ if [ -z $depthLevel ]; then
 	depthLevel=2
 fi
 
-exa --tree --level=$depthLevel --long 
+exa --tree --level=$depthLevel --long --group
 
