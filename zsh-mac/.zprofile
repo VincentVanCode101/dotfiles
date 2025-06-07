@@ -29,15 +29,13 @@ bindkey -s "^[g" "gitcheckoutFZF\n"
 # Ctrl+f
 bindkey -s ^f "tmux-sessionizer\n"
 
+bindkey "^[r" fzf-history-widget
+
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
 # Added by OrbStack: command-line tools and integration
 # This won't be added again if you remove it.
 source ~/.orbstack/shell/init.zsh 2>/dev/null || :
-
-bindkey "^[r" fzf-history-widget
-
-
 
 source /opt/homebrew/share/powerlevel10k/powerlevel10k.zsh-theme
 
