@@ -26,11 +26,6 @@
         "when": "terminalFocus"
     },
     {
-        "key": "ctrl+[BracketLeft]",
-        "command": "python.execInTerminal",
-        "when": "editorLangId == py"
-    },
-    {
         "key": "ctrl+shift+[Quote]",
         "command": "workbench.action.closePanel"
     },
@@ -66,14 +61,6 @@
         "key": "ctrl+k ctrl+-",
         "command": "-editor.foldAllExcept",
         "when": "editorTextFocus && foldingEnabled"
-    },
-    {
-        "key": "ctrl+shift+k z",
-        "command": "workbench.action.toggleZenMode"
-    },
-    {
-        "key": "ctrl+k z",
-        "command": "-workbench.action.toggleZenMode"
     },
     {
         "key": "ctrl+shift+d",

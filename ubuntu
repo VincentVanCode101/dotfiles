@@ -1,8 +1,19 @@
 #!/usr/bin/env zsh
 
-if [[ -z $STOW_FOLDERS ]]; then
-    STOW_FOLDERS="zsh,i3,nvim,tmux,bin,code,polybar"
-fi
+OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+
+case "$OS" in
+    linux)
+        STOW_FOLDERS="zsh-linux,i3,nvim,tmux-linux,bin,code-linux,polybar"
+        ;;
+    darwin)
+        STOW_FOLDERS="zsh-mac,tmux-mac,bin"
+        ;;
+    *)
+        echo "Unsupported OS: $OS"
+        exit 1
+        ;;
+esac
 
 if [[ -z $DOTFILES ]]; then
     DOTFILES=$HOME/dotfiles

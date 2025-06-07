@@ -1,0 +1,43 @@
+set -g default-terminal "tmux-256color"
+set -as terminal-overrides ',tmux-256color:RGB'
+
+set -s escape-time 0
+
+unbind C-b
+set-option -g prefix C-a
+bind-key C-a send-prefix
+set -g status-style 'bg=#333333 fg=#5eacd3'
+
+bind r source-file ~/.tmux.conf
+set -g base-index 1
+
+set-window-option -g mode-keys vi
+bind -T copy-mode-vi v send-keys -X begin-selection
+bind -T copy-mode-vi y send-keys -X copy-pipe-and-cancel 'pbcopy'
+
+
+# vim-like pane switching
+bind -r o last-window
+bind -r k select-pane -U
+bind -r j select-pane -D
+bind -r h select-pane -L
+bind -r l select-pane -R
+
+bind -r T neww -c "#{pane_current_path}" "[[ -e TODO.md ]] && nvim TODO.md || nvim ~/dotfiles/personal/todo.md"
+
+# [ ] TODO: figure out why this fails
+#bind-key i run-shell "/home/christoph/dotfiles/bin/.local/scripts/curlCht.sh"
+
+# NEW window
+bind-key -r n run-shell "tmux neww"
+
+#bind-key -r Z run-shell "~/.local/scripts/tmux-sessionizer ~/work/SLV/spryker"
+#bind-key -r U run-shell "~/.local/scripts/tmux-sessionizer ~/work/maintainer/java-backend"
+#bind-key -r I run-shell "~/.local/scripts/tmux-sessionizer ~/work/maintainer/frontend-clone"
+
+#bind-key -r H run-shell "~/.local/scripts/tmux-sessionizer ~/projects/craft-templates"
+#bind-key -r J run-shell "~/.local/scripts/tmux-sessionizer ~/projects/craft"
+
+set -g mouse on
+
+set-environment -g SSH_AUTH_SOCK $SSH_AUTH_SOCK
