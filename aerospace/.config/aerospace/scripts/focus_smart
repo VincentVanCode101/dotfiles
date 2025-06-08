@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Direction should be one of: left, right, up, down
+direction="$1"
+
+# Try to focus in the given direction within the current monitor
+if aerospace focus --boundaries workspace --boundaries-action fail "$direction"; then
+    exit 0
+else
+    # If that failed, switch to the next monitor in that direction
+    aerospace focus --boundaries all-monitors-outer-frame --boundaries-action wrap-around-all-monitors "$direction"
+fi

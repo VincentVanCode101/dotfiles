@@ -29,7 +29,6 @@ bindkey -s "^[g" "gitcheckoutFZF\n"
 # Ctrl+f
 bindkey -s ^f "tmux-sessionizer\n"
 
-bindkey "^[r" fzf-history-widget
 
 eval "$(/opt/homebrew/bin/brew shellenv)"
 

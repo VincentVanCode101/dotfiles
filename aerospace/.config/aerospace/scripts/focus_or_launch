@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+APP_NAME="$1"
+
+if [[ -z "$APP_NAME" ]]; then
+  echo "Usage: $0 <App Name>"
+  exit 1
+fi
+
+WIN_ID=$(aerospace list-windows --all --json 2>/dev/null | jq -r --arg app "$APP_NAME" '
+  map(select(."app-name" == $app)) | first | .["window-id"]
+')
+
+if [[ -n "$WIN_ID" && "$WIN_ID" != "null" ]]; then
+  aerospace focus "$WIN_ID"
+else
+  open -a "$APP_NAME"
+fi

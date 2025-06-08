@@ -1,0 +1,129 @@
+# Reference: https://github.com/i3/i3/blob/next/etc/config
+
+# i3 doesn't have "normalizations" feature that why we disable them here.
+# But the feature is very helpful.
+# Normalizations eliminate all sorts of weird tree configurations that don't make sense.
+# Give normalizations a chance and enable them back.
+
+enable-normalization-flatten-containers = false
+enable-normalization-opposite-orientation-for-nested-containers = false
+start-at-login = true
+# Mouse follows focus when focused monitor changes
+on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
+
+default-root-container-layout = 'tiles'
+[mode.main.binding]
+    # See: https://nikitabobko.github.io/AeroSpace/goodies#open-a-new-window-with-applescript
+
+    #ctrl-enter = '''exec-and-forget osascript -e '
+    #tell application "Terminal"^
+    #    do script
+    #    activate
+    #end tell'
+    #'''
+
+    ctrl-enter = '''exec-and-forget osascript -e '
+    tell application "iTerm"
+        create window with default profile
+        tell current session of current window
+            write text "tmux new-session \\; source-file ~/.tmux-conf"
+        end tell
+        activate
+    end tell'
+    '''
+
+
+
+    # i3 wraps focus by default
+    ctrl-h = '''exec-and-forget ~/.config/aerospace/scripts/focus_smart left'''
+    ctrl-j = '''exec-and-forget ~/.config/aerospace/scripts/focus_smart down'''
+    ctrl-k = '''exec-and-forget ~/.config/aerospace/scripts/focus_smart up'''
+    ctrl-l = '''exec-and-forget ~/.config/aerospace/scripts/focus_smart right'''
+
+
+
+    ctrl-shift-h = 'move left'
+    ctrl-shift-j = 'move down'
+    ctrl-shift-k = 'move up'
+    ctrl-shift-l = 'move right'
+
+
+
+    # Consider using 'join-with' command as a 'split' replacement if you want to enable
+    # normalizations
+    #ctrl-h = 'split horizontal'
+    #ctrl-v = 'split vertical'
+
+    alt-f = 'fullscreen'
+
+    #ctrl-s = 'layout v_accordion' # 'layout stacking' in i3
+    #ctrl-w = 'layout h_accordion' # 'layout tabbed' in i3
+    #ctrl-e = 'layout tiles horizontal vertical' # 'layout toggle split' in i3
+
+    #ctrl-shift-space = 'layout floating tiling' # 'floating toggle' in i3
+
+    # Not supported, because this command is redundant in AeroSpace mental model.
+    # See: https://nikitabobko.github.io/AeroSpace/guide#floating-windows
+    #ctrl-space = 'focus toggle_tiling_floating'
+
+    # `focus parent`/`focus child` are not yet supported, and it's not clear whether they
+    # should be supported at all https://github.com/nikitabobko/AeroSpace/issues/5
+    # ctrl-a = 'focus parent'
+
+    ctrl-1 = 'workspace 1'
+    ctrl-2 = 'workspace 2'
+    ctrl-3 = 'workspace 3'
+    ctrl-4 = 'workspace 4'
+    ctrl-5 = 'workspace 5'
+    ctrl-6 = 'workspace 6'
+    ctrl-7 = 'workspace 7'
+    ctrl-8 = 'workspace 8'
+    ctrl-9 = 'workspace 9'
+    ctrl-0 = 'workspace 10'
+
+    ctrl-cmd-w = '''exec-and-forget ~/.config/aerospace/scripts/focus_or_launch WhatsApp'''
+    ctrl-cmd-s = '''exec-and-forget ~/.config/aerospace/scripts/focus_or_launch Spotify'''
+    ctrl-cmd-k = '''exec-and-forget ~/.config/aerospace/scripts/focus_or_launch KeePassXC'''
+
+    ctrl-shift-1 = 'move-node-to-workspace 1'
+    ctrl-shift-2 = 'move-node-to-workspace 2'
+    ctrl-shift-3 = 'move-node-to-workspace 3'
+    ctrl-shift-4 = 'move-node-to-workspace 4'
+    ctrl-shift-5 = 'move-node-to-workspace 5'
+    ctrl-shift-6 = 'move-node-to-workspace 6'
+    ctrl-shift-7 = 'move-node-to-workspace 7'
+    ctrl-shift-8 = 'move-node-to-workspace 8'
+    ctrl-shift-9 = 'move-node-to-workspace 9'
+    ctrl-shift-0 = 'move-node-to-workspace 0'
+
+
+    ctrl-shift-c = 'reload-config'
+
+    alt-r = 'mode resize'
+
+    ctrl-shift-q = 'close'
+
+    cmd-h = []
+    cmd-alt-h = []
+
+[workspace-to-monitor-force-assignment]
+1 = ['Built-in Retina Display', 'DELL P3421W', 'DELL S2721QSA']
+2 = ['Built-in Retina Display', 'DELL P3421W', 'DELL S2721QSA']
+
+3 = ['DELL P3421W', 'DELL S2721QSA', 'Built-in Retina Display']
+4 = ['DELL P3421W', 'DELL S2721QSA', 'Built-in Retina Display']
+5 = ['DELL P3421W', 'DELL S2721QSA', 'Built-in Retina Display']
+6 = ['DELL P3421W', 'DELL S2721QSA', 'Built-in Retina Display']
+7 = ['DELL P3421W', 'DELL S2721QSA', 'Built-in Retina Display']
+
+8 = ['DELL S2721QSA', 'DELL P3421W', 'Built-in Retina Display']
+9 = ['DELL S2721QSA', 'DELL P3421W', 'Built-in Retina Display']
+10 = ['DELL S2721QSA', 'DELL P3421W', 'Built-in Retina Display']
+
+[mode.resize.binding]
+    h = 'resize width -70'
+    j = 'resize height +70'
+    k = 'resize height -70'
+    l = 'resize width +70'
+    enter = 'mode main'
+    esc = 'mode main'
