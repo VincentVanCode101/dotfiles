@@ -12,7 +12,8 @@ WIN_ID=$(aerospace list-windows --all --json 2>/dev/null | jq -r --arg app "$APP
 ')
 
 if [[ -n "$WIN_ID" && "$WIN_ID" != "null" ]]; then
-  aerospace focus "$WIN_ID"
+  aerospace focus --window-id "$WIN_ID"
 else
+  aerospace summon-workspace "$APP_NAME"
   open -a "$APP_NAME"
 fi

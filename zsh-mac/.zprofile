@@ -1,3 +1,7 @@
+######################################################################################
+# ALIAS
+######################################################################################
+
 alias k="kubectl"
 alias dfu="docker compose -f docker-compose.dev.yml up"
 alias dfd="docker compose -f docker-compose.dev.yml down"
@@ -8,13 +12,17 @@ alias dcd="docker compose down"
 alias fd="fdfind"
 alias bat="batcat"
 
+######################################################################################
+# PATHS
+######################################################################################
+
 export PATH="$PATH:$HOME/little-projects/unix-shell-scripts"
-export PATH="$PATH:$HOME/docker-apps/bin"
+export PATH="$PATH:$HOME/projects/docker-apps/bin"
 export PATH="$PATH:$HOME/projects/toolbox-exec"
 export PATH="$PATH:$HOME/.local/scripts"
 
 ######################################################################################
-# Custom Keyboard Shortcuts
+# CUSTOM KEYBOARD SHORTCUTS
 ######################################################################################
 
 # Alt+e
@@ -29,6 +37,9 @@ bindkey -s "^[g" "gitcheckoutFZF\n"
 # Ctrl+f
 bindkey -s ^f "tmux-sessionizer\n"
 
+######################################################################################
+# BREW
+######################################################################################
 
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
@@ -36,8 +47,15 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 # This won't be added again if you remove it.
 source ~/.orbstack/shell/init.zsh 2>/dev/null || :
 
+######################################################################################
+# P10K
+######################################################################################
+
 source /opt/homebrew/share/powerlevel10k/powerlevel10k.zsh-theme
 
+######################################################################################
+# 
+######################################################################################
 
 export FZF_DEFAULT_COMMAND="find ~/ -maxdepth 4 -type d ! -path '*/.git/*' ! -path '*/.vscode/*' 2> /dev/null"
 
