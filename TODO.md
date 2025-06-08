@@ -9,5 +9,6 @@
     - alt-right + 6 is ]
     - alt-right + 8 is {
     - alt-right + 9 is }
+    - alt-right + shift + 7 is \
 
     all to resemble mac os keyboard
