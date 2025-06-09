@@ -22,7 +22,7 @@ echo "$(date) - [START] Auto sync watcher started" >> "$LOG_OUT"
 commit_and_push() {
     if [ -n "$(git status --porcelain)" ]; then
         git add -A
-        if git commit -m "Auto commit $(date)"; then
+        if git commit -m "Auto commit from $(uname -n) ($(date +"%a., %d %b. %Y %H:%M:%S %z"))"; then
             if git push origin "$(git rev-parse --abbrev-ref HEAD)"; then
                 echo "$(date) - [PUSHED] Changes pushed" >> "$LOG_OUT"
             else
