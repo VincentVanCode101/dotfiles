@@ -1,80 +1,76 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+export HOME="${HOME:-/Users/christoph}"
+export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+
 set -euo pipefail
 
-# Logging functions
-log_info() {
-    echo "$(date +'%Y-%m-%d %H:%M:%S') - INFO: $1"
-}
+OS_TYPE=$(uname -s)
+GTIMEOUT=$(command -v gtimeout || echo "/opt/homebrew/bin/gtimeout")
 
-log_error() {
-    # Log errors to stderr
-    echo "$(date +'%Y-%m-%d %H:%M:%S') - ERROR: $1" >&2
-}
+WATCH_DIR="$HOME/personal/notes/second-brain"
+LOG_OUT="/tmp/auto-sync-second-brain.out"
+LOG_ERR="/tmp/auto-sync-second-brain.err"
 
-log_push() {
-    log_info "Pushed local changes"
-}
-
-log_pull() {
-    log_info "Pulled remote changes"
-}
-
-# Trap any error and log it before exiting.
-trap 'log_error "Error on line ${LINENO}: Command '\''$BASH_COMMAND'\'' exited with status $?"' ERR
-
-TARGET_DIR="/home/christoph/personal/notes/second-brain"
-
-cd "$TARGET_DIR" || {
-    log_error "Could not change directory to script location."
+cd "$WATCH_DIR" || {
+    echo "$(date) - [ERROR] Could not cd to $WATCH_DIR" >> "$LOG_ERR"
     exit 1
 }
 
-# Determine the current branch; default to "main" if not found.
-BRANCH=$(git symbolic-ref --short HEAD 2>/dev/null || echo "main")
+echo "$(date) - [START] Auto sync watcher started" >> "$LOG_OUT"
 
-# Commit and push local changes if any modifications exist.
 commit_and_push() {
     if [ -n "$(git status --porcelain)" ]; then
         git add -A
-        if git commit -m "Auto commit from $(uname -n) ($(date +"%a., %d %b. %Y %H:%M:%S %z"))"; then
-            if git push origin "$BRANCH"; then
-                log_push
+        if git commit -m "Auto commit $(date)"; then
+            if git push origin "$(git rev-parse --abbrev-ref HEAD)"; then
+                echo "$(date) - [PUSHED] Changes pushed" >> "$LOG_OUT"
             else
-                log_error "Git push failed."
+                echo "$(date) - [ERROR] Git push failed" >> "$LOG_ERR"
             fi
         else
-            log_error "Git commit failed."
+            echo "$(date) - [ERROR] Git commit failed" >> "$LOG_ERR"
         fi
     fi
 }
 
-# Fetch remote changes and pull them if the local HEAD differs from remote.
 pull_remote_if_needed() {
     if git fetch origin; then
-        local local_head remote_head
         local_head=$(git rev-parse HEAD)
-        remote_head=$(git rev-parse "origin/$BRANCH")
+        remote_head=$(git rev-parse "origin/$(git rev-parse --abbrev-ref HEAD)")
         if [ "$local_head" != "$remote_head" ]; then
-            if git pull --rebase origin "$BRANCH"; then
-                log_pull
+            if git pull --rebase origin "$(git rev-parse --abbrev-ref HEAD)"; then
+                echo "$(date) - [PULLED] Remote changes pulled" >> "$LOG_OUT"
             else
-                log_error "Git pull failed."
+                echo "$(date) - [ERROR] Git pull failed" >> "$LOG_ERR"
             fi
         fi
     else
-        log_error "Git fetch failed."
+        echo "$(date) - [ERROR] Git fetch failed" >> "$LOG_ERR"
     fi
 }
 
-# Main loop:
-# - Waits for local filesystem changes with a 60-second timeout.
-# - If an event is detected, waits briefly (debounce) then commits & pushes local changes.
-# - If the timeout expires (no local changes), it checks for remote updates.
 while true; do
-    if fswatch -r -o . | head -n 1; then
-        sleep 10 # Debounce: wait for rapid changes to settle.
-        commit_and_push
+    if [[ "$OS_TYPE" == "Linux" ]]; then
+        if inotifywait -r -e modify,create,delete,move -t 60 .; then
+            echo "$(date) - [INFO] Filesystem change detected (Linux)" >> "$LOG_OUT"
+            sleep 10
+            commit_and_push
+        else
+            echo "$(date) - [INFO] No changes, checking remote (Linux)" >> "$LOG_OUT"
+            pull_remote_if_needed
+        fi
+    elif [[ "$OS_TYPE" == "Darwin" ]]; then
+        if "$GTIMEOUT" 60 fswatch -r -1 .; then
+            echo "$(date) - [INFO] Filesystem change detected (macOS)" >> "$LOG_OUT"
+            sleep 10
+            commit_and_push
+        else
+            echo "$(date) - [INFO] No changes, checking remote (macOS)" >> "$LOG_OUT"
+            pull_remote_if_needed
+        fi
     else
-        pull_remote_if_needed
+        echo "$(date) - [ERROR] Unsupported OS: $OS_TYPE" >> "$LOG_ERR"
+        exit 1
     fi
 done
