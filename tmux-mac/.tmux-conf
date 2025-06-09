@@ -1,6 +1,8 @@
 set -g default-terminal "tmux-256color"
 set -as terminal-overrides ',tmux-256color:RGB'
 
+set-option -g default-command "exec zsh -l"
+
 set -s escape-time 0
 
 unbind C-b
