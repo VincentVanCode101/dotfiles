@@ -27,6 +27,7 @@ alias bat="batcat"
 # PATHS
 ######################################################################################
 
+export PATH="$PATH:/opt/homebrew/bin"
 export PATH="$PATH:$HOME/little-projects/unix-shell-scripts"
 export PATH="$PATH:$HOME/projects/docker-apps/bin"
 export PATH="$PATH:$HOME/projects/toolbox-exec"
