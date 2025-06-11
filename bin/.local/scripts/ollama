@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+PROMPT=$@
+
+echo $PROMPT
+
+if ! docker run -d -v ollama:/root/.ollama -p 11434:11434 --name ollama ollama/ollama >/dev/null 2>&1; then
+    docker start ollama
+fi
