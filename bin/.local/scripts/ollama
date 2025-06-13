@@ -1,9 +1,26 @@
 #!/usr/bin/env bash
 
-PROMPT=$@
+set -Eeuo pipefail
 
-echo $PROMPT
+if [ "${1:-}" = "stop" ]; then
+    docker stop ollama >/dev/null 2>&1
+    echo "STOPPED ollama"
+    exit 0
+fi
 
 if ! docker run -d -v ollama:/root/.ollama -p 11434:11434 --name ollama ollama/ollama >/dev/null 2>&1; then
+
+    echo "STARTED ollama"
     docker start ollama
+fi
+
+if [ $# -gt 0 ] && [ "$1" = stop ]; then
+    shift
+fi
+
+if [ $# -eq 0 ]; then
+    docker exec -it ollama /bin/bash
+else
+    echo "$@"
+    docker exec ollama ollama "$@"
 fi

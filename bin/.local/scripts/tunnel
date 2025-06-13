@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+    echo "Usage: $0 {start|stop} <target-host> <bastion-user> <bastion-host> <bastion-port> <final-user> <target-ip>"
+    echo
+    echo "Example:"
+    echo "  $0 start dev jon.doe my-jumphost 11111 jon.doe.admin 11.1.11.1"
+    exit 1
+}
+
+if [ "$#" -ne 7 ]; then
+    usage
+fi
+
+ACTION="$1"
+TARGET_HOST="$2"
+BASTION_USER="$3"
+BASTION_HOST="$4"
+BASTION_PORT="$5"
+FINAL_USER="$6"
+TARGET_IP="$7"
+
+LOCAL_PORT=15432
+DB_PORT=5432
+
+case "$ACTION" in
+start)
+    echo "Starting tunnel:"
+    echo "  -L ${LOCAL_PORT}:${TARGET_HOST}:${DB_PORT}"
+    echo "  -J ${BASTION_USER}@${BASTION_HOST}:${BASTION_PORT}"
+    echo "  ${FINAL_USER}@${TARGET_IP}"
+
+    ssh -fN \
+        -L "${LOCAL_PORT}:${TARGET_HOST}:${DB_PORT}" \
+        -J "${BASTION_USER}@${BASTION_HOST}:${BASTION_PORT}" \
+        "${FINAL_USER}@${TARGET_IP}"
+
+    echo "Tunnel established. Connect on localhost:${LOCAL_PORT}."
+    ;;
+
+stop)
+    echo "Stopping tunnel to ${TARGET_HOST}:${DB_PORT}..."
+    PIDS=$(ps aux |
+        grep '[s]sh -fN' |
+        grep "${LOCAL_PORT}:${TARGET_HOST}:${DB_PORT}" |
+        awk '{print $2}')
+
+    if [ -z "$PIDS" ]; then
+        echo "No matching tunnel processes found."
+        exit 0
+    fi
+
+    echo "Killing PIDs: $PIDS"
+    kill $PIDS
+    echo "Tunnel stopped."
+    ;;
+
+*)
+    usage
+    ;;
+esac

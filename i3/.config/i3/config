@@ -61,9 +61,9 @@ bindsym $mod+Return exec i3-sensible-terminal -e tmux
 # kill focused window
 bindsym $mod+Shift+q kill
 
-# start dmenu (a program launcher) with the zsh
-
-bindsym $mod+d exec --no-startup-id zsh -c 'source ~/.zshrc && exec dmenu_run'
+# start dmenu (a program launcher) with the zsh sourced
+bindsym $mod+space exec --no-startup-id zsh -c 'source ~/.zshrc && exec dmenu_run'
+# ... mod space instead of mod d to resemble mac keyboard
 #bindsym $mod+d exec --no-startup-id zsh -c 'source ~/.zshrc && rofi -show drun -theme Arc-Dark'
 
 
