@@ -7,7 +7,7 @@ case "$OS" in
         STOW_FOLDERS="zsh-linux,i3,nvim,tmux-linux,bin,code-linux,polybar"
         ;;
     darwin)
-        STOW_FOLDERS="zsh-mac,tmux-mac,bin,aerospace"
+        STOW_FOLDERS="code-mac,zsh-mac,tmux-mac,bin,aerospace"
         ;;
     *)
         echo "Unsupported OS: $OS"

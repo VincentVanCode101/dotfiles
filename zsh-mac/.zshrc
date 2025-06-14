@@ -88,3 +88,11 @@ setopt APPEND_HISTORY             # Append to the history file, don’t overwrit
 setopt INC_APPEND_HISTORY         # Write to the history file immediately
 setopt SHARE_HISTORY              # Share command history across terminals
 setopt HIST_IGNORE_ALL_DUPS       # Prevent duplicates
+
+plugins=(
+  git
+  zsh-autosuggestions
+  aliases
+)
+ 
+ source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
