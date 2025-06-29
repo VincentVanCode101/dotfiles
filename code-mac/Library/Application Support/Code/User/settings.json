@@ -79,10 +79,30 @@
             "commands": [
                 "editor.action.quickFix"
             ]
+        },
+        {
+            "before": [
+                "leader",
+                "k"
+            ],
+            "commands": [
+                "editor.action.showHover"
+            ]
+        },
+        {
+            "before": [
+                "leader",
+                "c",
+                "a"
+            ],
+            "commands": [
+                "editor.action.quickFix"
+            ]
         }
     ],
     "extensions.experimental.affinity": {
         "vscodevim.vim": 1,
         "asvetliakov.vscode-neovim": 1
     },
+    "diffEditor.hideUnchangedRegions.enabled": true,
 }
