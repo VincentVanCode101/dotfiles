@@ -1,0 +1,142 @@
+#!/usr/bin/env bash
+#
+# measure_power_cost_adaptive.sh
+#
+# Liest zuerst mittels upower die "energy-rate" (W) der Batterie aus.
+# - Wenn die Batterie entlädt (energy-rate > 0), wird dieser Wert genutzt.
+# - Wenn energy-rate == 0 (Batterie voll / AC-Modus), wird statt dessen powerstat herangezogen.
+#
+# Aus dem Watt-Wert wird dann (kWh) und der Preis (€) berechnet: €/h, €/Tag, €/Monat, €/Jahr.
+#
+# Usage:
+#   sudo ./measure_power_cost_adaptive.sh [UPATH] [PRICE_PER_KWH] [DURATION_POWERSTAT]
+#
+#   UPATH:               (optional) UPower-Geräte-Pfad (Batterie). Default: /org/freedesktop/UPower/devices/battery_BAT0
+#   PRICE_PER_KWH:       (optional) Strompreis in €/kWh (z.B. 0.398). Wenn fehlt, wird nachgefragt.
+#   DURATION_POWERSTAT:  (optional) Dauer in Sekunden für powerstat, falls AC-Modus. Default: 5
+#
+# Requirements:
+#   - upower    (in den meisten Distros vorinstalliert)
+#   - bc        (für Fließkomma-Berechnungen)
+#   - powerstat (muss installiert sein: z.B. `sudo apt-get install powerstat`)
+#
+# Hinweis: powerstat muss als Root laufen, um die Hardware-Sensoren auszulesen.
+#
+
+set -euo pipefail
+
+# Defaults
+DEFAULT_UPATH="/org/freedesktop/UPower/devices/battery_BAT0"
+DEFAULT_POWERSTAT_DURATION=5
+
+# Argument‐Parsing
+UPATH="${1:-$DEFAULT_UPATH}"
+PRICE_KWH="${2:-}"
+POWERSTAT_DURATION="${3:-$DEFAULT_POWERSTAT_DURATION}"
+
+# Prüffunktionen
+command_exists() { command -v "$1" &>/dev/null; }
+
+# 1) Dependencies prüfen
+if ! command_exists upower; then
+    echo "Error: 'upower' ist nicht installiert." >&2
+    echo "Bitte installieren: sudo apt-get install upower" >&2
+    exit 1
+fi
+
+if ! command_exists bc; then
+    echo "Error: 'bc' ist nicht installiert." >&2
+    echo "Bitte installieren: sudo apt-get install bc" >&2
+    exit 1
+fi
+
+if ! command_exists powerstat; then
+    echo "Warning: 'powerstat' ist nicht installiert." >&2
+    echo "Wenn AC-Modus ansteht, kannst du powerstat nachinstallieren:" >&2
+    echo "  sudo apt-get install powerstat" >&2
+    echo "Falls du powerstat nicht installieren möchtest, bricht das Skript im AC-Fall ab." >&2
+fi
+
+# 2) UPATH prüfen
+if ! upower -i "$UPATH" &>/dev/null; then
+    echo "Error: UPower-Gerät '$UPATH' nicht gefunden oder nicht erreichbar." >&2
+    echo "Verfügbare Geräte: upower -e" >&2
+    exit 1
+fi
+
+# 3) Preis erfragen, falls nicht übergeben
+if [[ -z "$PRICE_KWH" ]]; then
+    read -rp "Gib deinen Strompreis in €/kWh ein (z.B. 0.398): " PRICE_KWH
+    if ! echo "$PRICE_KWH" | grep -Eq '^[0-9]+(\.[0-9]+)?$'; then
+        echo "Ungültiges Format. Bitte numerischen Wert eingeben (z.B. 0.398)." >&2
+        exit 1
+    fi
+fi
+
+# 4) Batterie-Energy-Rate auslesen
+RAW_POWER_W="$(upower -i "$UPATH" | grep -E "energy-rate" | awk '{print $2}')"
+
+# Sicherstellen, dass wir einen Zahlwert haben (wenn AC: RAW_POWER_W wird "0")
+if [[ -z "$RAW_POWER_W" ]] || ! echo "$RAW_POWER_W" | grep -Eq '^[0-9]+(\.[0-9]+)?$'; then
+    echo "Error: Konnte 'energy-rate' nicht als Zahl aus upower auslesen." >&2
+    exit 1
+fi
+
+# Interpretieren: Wenn RAW_POWER_W > 0, ist die Batterie im Entlade-Modus → wir nutzen jenen Wert.
+# Wenn RAW_POWER_W == 0, ist AC-Modus oder Batterie voll → fallback auf powerstat.
+POWER_W="$(printf "%.2f" "$RAW_POWER_W")"
+
+if (($(echo "$POWER_W > 0" | bc -l))); then
+    # Batterie entlädt: verwende direkt die energy-rate (W)
+    echo "Battery discharging: using upower energy-rate = $POWER_W W"
+else
+    # Batterie voll oder AC, verwende powerstat, falls installiert
+    if command_exists powerstat; then
+        echo "Battery full / AC-Modus erkannt (energy-rate=0). Fallback auf powerstat für aktuelle Systemleistung."
+        echo "powerstat misst für $POWERSTAT_DURATION Sekunden..."
+        # powerstat alle 1 Sekunde für POWERSTAT_DURATION Sekunden laufen lassen
+        PS_OUTPUT="$(sudo powerstat -d 1 "$POWERSTAT_DURATION" 2>/dev/null)"
+        AVG_W="$(echo "$PS_OUTPUT" |
+            grep -Ei 'Average power' |
+            awk '{ for(i=1;i<=NF;i++) if ($i ~ /[0-9]+\.[0-9]+/) { printf "%s\n", $i; exit } }')"
+
+        if [[ -z "$AVG_W" ]]; then
+            echo "Error: Konnte Durchschnittsleistung nicht aus powerstat auslesen." >&2
+            exit 1
+        fi
+
+        POWER_W="$(printf "%.2f" "$AVG_W")"
+        echo "powerstat → durchschnittliche Systemleistung: $POWER_W W"
+    else
+        echo "Error: powerstat ist nicht verfügbar, kann im AC-Modus keine Leistung messen." >&2
+        echo "Bitte installiere 'powerstat' oder benutze ein externes Watt-Messgerät." >&2
+        exit 1
+    fi
+fi
+
+# 5) Energie (kWh) und Kosten berechnen
+# Energie pro Stunde (kWh) = (POWER_W / 1000) * 1
+ENERGY_PER_HOUR_KWH="$(echo "scale=6; ($POWER_W / 1000) * 1" | bc)"
+
+# Kosten / Stunde (€) = ENERGY_PER_HOUR_KWH * PRICE_KWH
+COST_PER_HOUR="$(echo "scale=6; $ENERGY_PER_HOUR_KWH * $PRICE_KWH" | bc)"
+
+# Kosten / Tag (€) = COST_PER_HOUR * 24
+COST_PER_DAY="$(echo "scale=6; $COST_PER_HOUR * 24" | bc)"
+
+# Kosten / Monat (€) [30 Tage] = COST_PER_DAY * 30
+COST_PER_MONTH="$(echo "scale=6; $COST_PER_DAY * 30" | bc)"
+
+# Kosten / Jahr (€) [365 Tage] = COST_PER_DAY * 365
+COST_PER_YEAR="$(echo "scale=6; $COST_PER_DAY * 365" | bc)"
+
+# 6) Ergebnisse ausgeben
+printf "\nEnergy & Cost Estimates (based on %.2f W current draw):\n" "$POWER_W"
+printf "  • Energy per hour:   %0.6f kWh\n" "$ENERGY_PER_HOUR_KWH"
+printf "  • Cost per hour:     €%0.6f\n" "$COST_PER_HOUR"
+printf "  • Cost per day:      €%0.6f (24 h)\n" "$COST_PER_DAY"
+printf "  • Cost per month:    €%0.6f (30 days)\n" "$COST_PER_MONTH"
+printf "  • Cost per year:     €%0.6f (365 days)\n" "$COST_PER_YEAR"
+echo
+
+exit 0

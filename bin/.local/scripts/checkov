@@ -1,0 +1,111 @@
+#!/usr/bin/env bash
+# run_checkov_docker.sh
+# ------------------------------------------------------------
+# • No args  → run Checkov with local defaults
+# • Any args → act as pure wrapper, passing args straight through
+# Exit codes:
+#   0  all checks passed / only skipped
+#   1  one or more checks failed
+#   2  bad input (when in default-mode and path invalid)
+# ------------------------------------------------------------
+
+set -euo pipefail
+
+IMAGE="bridgecrew/checkov:3.2.442"
+ENTRYPOINT="/usr/bin/env"
+ENTRYPATH="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+HOST_ROOT="$(realpath "$PWD")"
+
+########################################################################
+# 1. WRAPPER MODE  (user supplied one or more args)
+########################################################################
+if (($#)); then
+    # build a safely-quoted command string:  checkov <all user args>
+    CHECKOV_CMD="checkov$(printf ' %q' "$@")"
+
+    echo -e "\n\e[1mRunning Checkov inside Docker (wrapper mode)…\e[0m"
+    echo "Image: $IMAGE"
+    echo "Cmd  : $CHECKOV_CMD"
+    echo
+
+    docker run --rm \
+        -v "$HOST_ROOT":"$HOST_ROOT" \
+        -w "$HOST_ROOT" \
+        --entrypoint "$ENTRYPOINT" \
+        "$IMAGE" \
+        $ENTRYPATH \
+        bash -c "$CHECKOV_CMD"
+    exit_code=$?
+
+    exit "$exit_code"
+fi
+
+########################################################################
+# 2. DEFAULT-MODE  (no args → emulate GitLab template)
+########################################################################
+
+# -- defaults (overridable via env-vars) -------------------------------
+: "${CHECKOV_SCAN_PATH:=$(pwd)}"
+: "${CHECKOV_OUTPUT_FORMAT:=cli}"
+: "${CHECKOV_OUTPUT_PATH:=console}"
+: "${CHECKOV_CLI_OUTPUT_QUIET:=true}"
+: "${CHECKOV_CLI_OUTPUT_COMPACT:=true}"
+: "${CHECKOV_DEBUG:=false}"
+: "${CHECKOV_ADDITIONAL_OPTIONS:=}"
+
+# -- validate path ----------------------------------------------------
+if [[ ! -e "$CHECKOV_SCAN_PATH" ]]; then
+    echo -e "\e[31mError: Path not found – $CHECKOV_SCAN_PATH\e[0m" >&2
+    exit 2
+fi
+[[ -f "$CHECKOV_SCAN_PATH" ]] && path_flag="-f" || path_flag="-d"
+
+ABS_SCAN_PATH="$(realpath "$CHECKOV_SCAN_PATH")"
+
+# -- build options string ---------------------------------------------
+opts="$path_flag \"$ABS_SCAN_PATH\""
+
+IFS=',' read -r -a fmt_arr <<<"$CHECKOV_OUTPUT_FORMAT"
+for fmt in "${fmt_arr[@]}"; do
+    opts+=" --output $fmt"
+done
+
+# output file paths (can be comma-sep, each gets its own flag)
+if [[ -n "$CHECKOV_OUTPUT_PATH" ]]; then
+    IFS=',' read -r -a path_arr <<<"$CHECKOV_OUTPUT_PATH"
+    for p in "${path_arr[@]}"; do
+        opts+=" --output-file-path $p"
+    done
+fi
+
+[[ "$CHECKOV_CLI_OUTPUT_QUIET" == "true" ]] && opts+=" --quiet"
+[[ "$CHECKOV_CLI_OUTPUT_COMPACT" == "true" ]] && opts+=" --compact"
+[[ -n "$CHECKOV_ADDITIONAL_OPTIONS" ]] && opts+=" $CHECKOV_ADDITIONAL_OPTIONS"
+[[ "$CHECKOV_DEBUG" == "true" ]] && LOG_LEVEL_ARG="LOG_LEVEL=INFO" || LOG_LEVEL_ARG=""
+
+CHECKOV_CMD="checkov $opts"
+
+echo -e "\n\e[1mRunning Checkov inside Docker (default mode)...\e[0m"
+echo "Image: $IMAGE"
+echo "Cmd  : $CHECKOV_CMD"
+echo
+
+docker run --rm \
+    -v "$HOST_ROOT":"$HOST_ROOT" \
+    -w "$HOST_ROOT" \
+    --entrypoint "$ENTRYPOINT" \
+    "$IMAGE" \
+    $ENTRYPATH ${LOG_LEVEL_ARG:+$LOG_LEVEL_ARG} \
+    bash -c "$CHECKOV_CMD --show-config && $CHECKOV_CMD"
+exit_code=$?
+
+echo
+if [[ $exit_code -eq 0 ]]; then
+    echo -e "\e[32mCheckov finished – no failed checks.\e[0m"
+elif [[ $exit_code -eq 1 ]]; then
+    echo -e "\e[31mCheckov finished – one or more checks FAILED.\e[0m"
+else
+    echo -e "\e[31mCheckov exited with code $exit_code (unexpected).\e[0m"
+fi
+exit "$exit_code"

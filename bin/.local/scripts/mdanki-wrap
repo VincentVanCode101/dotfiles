@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+command -v mdanki >/dev/null 2>&1 || {
+    echo "Error: mdanki not found in \$PATH. Check out https://github.com/VincentVanCode101/docker-apps.git to install it" >&2
+    exit 1
+}
+
+usage() {
+    echo "Usage: $(basename "$0") <markdown_file>"
+    exit 1
+}
+
+[[ $# -ne 1 ]] && usage
+[[ ! -f $1 ]] && {
+    echo "$1 is not a file"
+    exit 1
+}
+
+# --- resolve any symlinks
+SRC=$(readlink -f "$1")
+DIR=$(dirname "$SRC")
+BASE=$(basename "$SRC") # books.md
+NAME=${BASE%.*}         # books
+EXT=${BASE##*.}         # md
+
+PROCESSED_FILE="$DIR/${NAME}-processed.${EXT}"
+APKG="$DIR/${NAME}.apkg"
+
+# --- if an .apkg with the plain name exists, add a datestamp to the new one
+if [[ -f $APKG ]]; then
+    APKG="$DIR/${NAME}-$(date +%Y%m%d-%H%M%S).apkg"
+fi
+
+echo "INPUT   : $SRC"
+echo "OUTPUT  : $APKG"
+echo "DECK    : $NAME"
+echo "PROCESSED TARGET : $PROCESSED_FILE"
+echo
+
+# --- run mdanki
+mdanki "$SRC" "$APKG" --decks "$NAME"
+
+# --- archive the source
+trim_blanks() {
+    # remove ALL leading and trailing blank lines (including space- or tab-only ones)
+    #   1. '/./,$!d'  - delete until we hit the first non-blank line
+    #   2. tac … same again - kills blanks at the tail
+    sed '/./,$!d' "$1" | tac | sed '/./,$!d' | tac
+}
+
+if [[ -f $PROCESSED_FILE ]]; then
+    # ensure the processed file currently ends with exactly ONE newline
+    [[ $(tail -c1 "$PROCESSED_FILE") == $'\n' ]] || printf '\n' >>"$PROCESSED_FILE"
+
+    # append the cleaned-up new notes
+    trim_blanks "$SRC" >>"$PROCESSED_FILE"
+else
+    # first run - create the processed file
+    trim_blanks "$SRC" >"$PROCESSED_FILE"
+fi
+
+rm "$SRC"
+
+echo "Done."
+echo "Created  : $APKG"
+echo "Archived : $PROCESSED_FILE"
