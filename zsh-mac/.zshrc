@@ -22,6 +22,7 @@ alias dcu="docker compose up"
 alias dcd="docker compose down"
 alias fd="fdfind"
 alias bat="batcat"
+alias icloud='cd ~/Library/Mobile\ Documents/com~apple~CloudDocs'
 
 ######################################################################################
 # PATHS
