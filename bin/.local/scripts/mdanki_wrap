@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
+
+# --- Check for mdanki
 command -v mdanki >/dev/null 2>&1 || {
     echo "Error: mdanki not found in \$PATH. Check out https://github.com/VincentVanCode101/docker-apps.git to install it" >&2
     exit 1
 }
 
+# --- Validate input
 if [[ $# -lt 1 ]]; then
   echo "Usage: $0 <input-file>"
   exit 1
@@ -22,14 +25,14 @@ fi
 echo "File exists. Continuing..."
 
 DIR=$(dirname "$SRC")
-BASE=$(basename "$SRC") # books.md
-NAME=${BASE%.*}         # books
-EXT=${BASE##*.}         # md
+BASE=$(basename "$SRC")        # e.g., books.md
+NAME=${BASE%.*}                # e.g., books
+EXT=${BASE##*.}                # e.g., md
 
 PROCESSED_FILE="$DIR/${NAME}-processed.${EXT}"
 APKG="$DIR/${NAME}.apkg"
 
-# --- if an .apkg with the plain name exists, add a datestamp to the new one
+# --- if a plain-named .apkg exists, add a datestamp
 if [[ -f $APKG ]]; then
     APKG="$DIR/${NAME}-$(date +%Y%m%d-%H%M%S).apkg"
 fi
@@ -40,28 +43,36 @@ echo "DECK    : $NAME"
 echo "PROCESSED TARGET : $PROCESSED_FILE"
 echo
 
-# --- run mdanki
+# --- Run mdanki
 mdanki "$SRC" "$APKG" --deck "$NAME"
 
-# --- archive the source
+# --- Function to trim leading/trailing blank lines (but preserve line order)
 trim_blanks() {
-    # remove ALL leading and trailing blank lines (including space- or tab-only ones)
-    #   1. '/./,$!d'  - delete until we hit the first non-blank line
-    #   2. tac … same again - kills blanks at the tail
-    sed '/./,$!d' "$1" | tac | sed '/./,$!d' | tac
+    # Remove leading and trailing blank lines, including space/tab-only lines
+    awk 'NF {p=1} p' "$1" | awk '{if (NF || prev) print; prev=NF}'
 }
 
+# --- Archive input content
 if [[ -f $PROCESSED_FILE ]]; then
-    # ensure the processed file currently ends with exactly ONE newline
-    [[ $(tail -c1 "$PROCESSED_FILE") == $'\n' ]] || printf '\n' >>"$PROCESSED_FILE"
+    tmp_file=$(mktemp)
 
-    # append the cleaned-up new notes
-    trim_blanks "$SRC" >>"$PROCESSED_FILE"
+    # Trim existing processed file
+    trim_blanks "$PROCESSED_FILE" > "$tmp_file"
+
+    # Ensure there's a blank line before appending new notes
+    printf '\n\n' >> "$tmp_file"
+
+    # Append cleaned-up new content
+    trim_blanks "$SRC" >> "$tmp_file"
+
+    mv "$tmp_file" "$PROCESSED_FILE"
 else
-    # first run - create the processed file
-    trim_blanks "$SRC" >"$PROCESSED_FILE"
+    # First run - create the processed file
+    trim_blanks "$SRC" > "$PROCESSED_FILE"
+    printf '\n' >> "$PROCESSED_FILE"
 fi
 
+# --- Delete the input file after archiving
 rm "$SRC"
 
 echo "Done."
