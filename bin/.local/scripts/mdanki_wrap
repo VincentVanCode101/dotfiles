@@ -26,7 +26,8 @@ echo "File exists. Continuing..."
 
 DIR=$(dirname "$SRC")
 BASE=$(basename "$SRC")        # e.g., books.md
-NAME=${BASE%.*}                # e.g., books
+RAW_NAME=${BASE%.*}            # e.g., MyDeckXXXExtra
+NAME="${RAW_NAME//XXX/::}"     # Replace 'XXX' with '::' for deck name
 EXT=${BASE##*.}                # e.g., md
 
 PROCESSED_FILE="$DIR/${NAME}-processed.${EXT}"
