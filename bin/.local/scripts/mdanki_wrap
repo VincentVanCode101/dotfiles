@@ -5,6 +5,11 @@ command -v mdanki >/dev/null 2>&1 || {
     exit 1
 }
 
+if [[ $# -lt 1 ]]; then
+  echo "Usage: $0 <input-file>"
+  exit 1
+fi
+
 INPUT="$1"
 SRC="$(cd "$(dirname "$INPUT")" && pwd)/$(basename "$INPUT")"
 echo "Resolved SRC: '$SRC'"
