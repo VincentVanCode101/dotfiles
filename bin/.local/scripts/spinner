@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Shows a spinner while another command is running. Randomly picks one of 12 spinner styles.
-# @args command to run (with any parameters) while showing a spinner. 
+# @args command to run (with any parameters) while showing a spinner.
 #       E.g. ‹spinner sleep 10›
 
 function shutdown() {
@@ -14,13 +14,14 @@ function cursorBack() {
 }
 
 function spinner() {
-  # make sure we use non-unicode character type locale 
+  # make sure we use non-unicode character type locale
   # (that way it works for any locale as long as the font supports the characters)
   local LC_CTYPE=C
 
   local pid=$1 # Process Id of the previous running command
 
-  case $(($RANDOM % 12)) in
+  # case $(($RANDOM % 12)) in
+  case 9 in
   0)
     local spin='⠁⠂⠄⡀⢀⠠⠐⠈'
     local charwidth=3
@@ -59,7 +60,7 @@ function spinner() {
     ;;
   9)
     local spin='◴◷◶◵'
-    local charwidth=3
+    local charwidth=10
     ;;
   10)
     local spin='◐◓◑◒'
@@ -85,6 +86,6 @@ function spinner() {
   return $?
 }
 
-("$@" 2>&1 > /dev/null) &
+("$@" 2>&1 >/dev/null) &
 
 spinner $!

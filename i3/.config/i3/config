@@ -254,6 +254,7 @@ bar {
 	output DP-3-3
 	output DP-3-2
 	output DP-2-2
+	output DP-2-3
 	output HDMI-1
 	tray_output DP-3-3 
 	#font pango:DejaVu Sans Mono 10
@@ -312,7 +313,10 @@ bindsym Print exec --no-startup-id maim "/home/$USER/Pictures/Screenshots/Screen
 
 bindsym $mod+Print exec --no-startup-id maim --window $(xdotool getactivewindow) "/home/$USER/Pictures/Screenshots/Screenshot_$(date +'%Y-%m-%d_%H-%M-%S').jpg"
 
-bindsym Shift+Print exec --no-startup-id maim --select "/home/$USER/Pictures/Screenshots/Screenshot_$(date +'%Y-%m-%d_%H-%M-%S').jpg"
+# bindsym Shift+Print exec --no-startup-id maim --select "/home/$USER/Pictures/Screenshots/Screenshot_$(date +'%Y-%m-%d_%H-%M-%S').jpg"
+# bindsym Shift+Print exec --no-startup-id shutter -s -e -n -o "/home/$USER/Pictures/Screenshots/Screenshot_%Y-%m-%d_%H-%M-%S.jpg"
+bindsym Shift+Print exec --no-startup-id maim --select | xclip -selection clipboard -t image/png
+
 
 ## Clipboard Screenshots
 bindsym Ctrl+Print exec --no-startup-id maim | xclip -selection clipboard -t image/png

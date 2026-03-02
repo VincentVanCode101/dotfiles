@@ -1,5 +1,6 @@
 #!/bin/bash
 
+xrandr --output DP-2-2 --off
 xrandr --output DP-3-1 --off
 xrandr --output DP-3-2 --off
 xrandr --output DP-3-3 --off

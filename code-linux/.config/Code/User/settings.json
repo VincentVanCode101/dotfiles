@@ -336,7 +336,8 @@
         "*.yml": "yaml",
         ".env": "dotenv",
         "*.conf": "plaintext",
-        "*.rmd": "markdown"
+        "*.rmd": "markdown",
+        "*.bats": "shellscript"
     },
     "editor.defaultFormatter": "ms-python.black-formatter",
     "black-formatter.importStrategy": "fromEnvironment",
@@ -388,5 +389,8 @@
     "security.workspace.trust.untrustedFiles": "open",
     "[typescript]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[bats]": {
+        "editor.defaultFormatter": "foxundermoon.shell-format"
     },
 }
