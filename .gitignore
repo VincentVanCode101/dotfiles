@@ -2,10 +2,10 @@
 .idea
 
 # Ignore everything in the code directory
-code/**
+code-linux/**
 
 # But not this specific file
-!code/.config/Code/User/settings.json
+!code-linux/.config/Code/User/settings.json
 
 # Ensure parent directories are not ignored
 !code/.config/
