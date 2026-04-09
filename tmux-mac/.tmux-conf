@@ -27,6 +27,12 @@ bind -r l select-pane -R
 
 bind -r T neww -c "#{pane_current_path}" "[[ -e TODO.md ]] && nvim TODO.md || nvim ~/dotfiles/personal/todo.md"
 
+# Split panes using | and -
+bind | split-window -h -c "#{pane_current_path}"
+bind - split-window -v -c "#{pane_current_path}"
+unbind '"'
+unbind %
+
 # [ ] TODO: figure out why this fails
 #bind-key i run-shell "/home/christoph/dotfiles/bin/.local/scripts/curlCht.sh"
 
