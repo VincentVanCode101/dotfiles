@@ -1,11 +1,30 @@
 # Aliases
 alias k="kubectl"
-alias dfu="docker compose -f docker-compose.dev.yml up"
-alias dfd="docker compose -f docker-compose.dev.yml down"
-alias dfb="docker compose -f docker-compose.dev.yml build"
+
+_df_logic() {
+  local cmd=$1
+  shift
+
+  if [ -f "compose.dev.yaml" ]; then
+    docker compose -f compose.dev.yaml "$cmd" "$@"
+  elif [ -f "compose.dev.yml" ]; then
+    docker compose -f compose.dev.yml "$cmd" "$@"
+  elif [ -f "docker-compose.dev.yaml" ]; then
+    docker compose -f docker-compose.dev.yaml "$cmd" "$@"
+  elif [ -f "docker-compose.dev.yml" ]; then
+    docker compose -f docker-compose.dev.yml "$cmd" "$@"
+  else
+    docker compose -f compose.dev.yaml "$cmd" "$@"
+  fi
+}
+
+alias dfu='_df_logic up'
+alias dfd='_df_logic down'
+alias dfb='_df_logic build'
 alias dcb="docker compose build"
 alias dcu="docker compose up"
 alias dcd="docker compose down"
+
 alias fd="fdfind"
 alias bat="batcat"
 

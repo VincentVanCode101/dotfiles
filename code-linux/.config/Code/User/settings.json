@@ -385,7 +385,7 @@
     },
     "window.menuBarVisibility": "toggle",
     "editor.renderWhitespace": "all",
-    "workbench.colorTheme": "Night Owl Light",
+    "workbench.colorTheme": "Night Owl Colorful HTML Light (No Italics)",
     "security.workspace.trust.untrustedFiles": "open",
     "[typescript]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
