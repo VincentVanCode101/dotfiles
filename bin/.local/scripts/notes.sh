@@ -24,4 +24,4 @@ fi
 
 GEOMETRY="180x44+0+0"
 
-gnome-terminal --geometry=$GEOMETRY -- bash -c "echo -ne '\033]0;nvim $FILE_PATH\007'; cd $NOTE_PATH && nvim $FILENAME; exec zsh"
+gnome-terminal --geometry=$GEOMETRY -- bash -c "echo -ne '\033]0;vim $FILE_PATH\007'; cd $NOTE_PATH && vim $FILENAME; exec zsh"
