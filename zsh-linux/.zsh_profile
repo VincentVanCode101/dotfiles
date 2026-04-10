@@ -131,6 +131,10 @@ export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/keyring/ssh"
 
 export DOTFILES=$HOME/dotfiles
 
+if [[ -n $SSH_CONNECTION ]]; then
+  export POWERLEVEL9K_CONTEXT_ALWAYS_SHOW=true
+fi
+
 ######################################################################################
 # End of .zsh_profile
 ######################################################################################
