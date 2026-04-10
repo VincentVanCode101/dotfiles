@@ -82,6 +82,18 @@ sedlinebreaks() {
   sed 's/\\n/\n/g'
 }
 
+# Wrap SSH to change terminal background color
+ssh() {
+  # Change background to a subtle red 
+  printf "\033]11;#FFE5E5\007"
+  
+  # Run the actual SSH command
+  command ssh "$@"
+  
+  # Revert background color to the terminal's default when SSH exits
+  printf "\033]111\007"
+}
+
 ######################################################################################
 # Custom Keyboard Shortcuts
 ######################################################################################
@@ -130,10 +142,6 @@ export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/keyring/ssh"
 ######################################################################################
 
 export DOTFILES=$HOME/dotfiles
-
-if [[ -n $SSH_CONNECTION ]]; then
-  export POWERLEVEL9K_CONTEXT_ALWAYS_SHOW=true
-fi
 
 ######################################################################################
 # End of .zsh_profile
