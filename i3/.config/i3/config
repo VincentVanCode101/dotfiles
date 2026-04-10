@@ -259,6 +259,7 @@ bar {
 	output DP-2-2
 	output DP-2-3
 	output HDMI-1
+	output HDMI-1-0
 	tray_output DP-3-3 
 	#font pango:DejaVu Sans Mono 10
         font pango: JetBrains Mono Regular, JetBrains Mono Light 10
