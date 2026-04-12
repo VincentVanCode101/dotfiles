@@ -66,6 +66,9 @@ esac
 alias dive="docker run -ti --rm  -v /var/run/docker.sock:/var/run/docker.sock docker.io/wagoodman/dive"
 alias dfimage="docker run -v /var/run/docker.sock:/var/run/docker.sock --rm alpine/dfimage"
 
+export VISUAL=vim
+export EDITOR="$VISUAL"
+
 ######################################################################################
 # Custom Functions
 ######################################################################################
