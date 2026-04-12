@@ -397,4 +397,5 @@
         "editor.defaultFormatter": "vscode.html-language-features"
     },
     "extensions.ignoreRecommendations": true,
+    "claudeCode.preferredLocation": "panel",
 }
