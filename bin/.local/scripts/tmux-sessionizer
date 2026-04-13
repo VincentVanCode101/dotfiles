@@ -1,25 +1,39 @@
 #!/usr/bin/env bash
 
+# 1. Select the directory
 if [[ $# -eq 1 ]]; then
     selected=$1
 else
-    selected=$(find  ~/projects ~/ ~/personal -mindepth 1 -maxdepth 2 -type d | fzf)
+    # Feel free to add/remove paths here
+    selected=$(find ~/projects ~/ ~/personal -mindepth 1 -maxdepth 2 -type d | fzf)
 fi
 
+# 2. Exit if no selection was made (e.g., pressed Esc in fzf)
 if [[ -z $selected ]]; then
     exit 0
 fi
 
+# 3. Clean the name for tmux (dots become underscores)
 selected_name=$(basename "$selected" | tr . _)
 tmux_running=$(pgrep tmux)
 
+# 4. Handle the "Start from Scratch" case
+# If tmux isn't running at all and we aren't in a session, start a new one
 if [[ -z $TMUX ]] && [[ -z $tmux_running ]]; then
     tmux new-session -s $selected_name -c $selected
     exit 0
 fi
 
+# 5. Create the session in the background if it doesn't already exist
 if ! tmux has-session -t=$selected_name 2> /dev/null; then
     tmux new-session -ds $selected_name -c $selected
 fi
 
-tmux switch-client -t $selected_name
+# 6. Attach vs Switch
+# If we are NOT inside a tmux session, we must 'attach'
+if [[ -z $TMUX ]]; then
+    tmux attach-session -t $selected_name
+# If we ARE already inside tmux, we 'switch' the client
+else
+    tmux switch-client -t $selected_name
+fi
