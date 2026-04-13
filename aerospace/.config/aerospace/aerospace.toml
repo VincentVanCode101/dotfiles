@@ -35,19 +35,20 @@ default-root-container-layout = 'tiles'
 
 
     # i3 wraps focus by default
-    ctrl-h = '''exec-and-forget ~/.config/aerospace/scripts/focus_smart left'''
-    ctrl-j = '''exec-and-forget ~/.config/aerospace/scripts/focus_smart down'''
-    ctrl-k = '''exec-and-forget ~/.config/aerospace/scripts/focus_smart up'''
-    ctrl-l = '''exec-and-forget ~/.config/aerospace/scripts/focus_smart right'''
+    #ctrl-h = '''exec-and-forget ~/.config/aerospace/scripts/focus_smart left'''
+    #ctrl-j = '''exec-and-forget ~/.config/aerospace/scripts/focus_smart down'''
+    #ctrl-k = '''exec-and-forget ~/.config/aerospace/scripts/focus_smart up'''
+    #ctrl-l = '''exec-and-forget ~/.config/aerospace/scripts/focus_smart right'''
 
-
+    ctrl-h = 'focus --boundaries all-monitors-outer-frame --boundaries-action wrap-around-all-monitors left'
+    ctrl-j = 'focus --boundaries all-monitors-outer-frame --boundaries-action wrap-around-all-monitors down'
+    ctrl-k = 'focus --boundaries all-monitors-outer-frame --boundaries-action wrap-around-all-monitors up'
+    ctrl-l = 'focus --boundaries all-monitors-outer-frame --boundaries-action wrap-around-all-monitors right'
 
     ctrl-shift-h = 'move left'
     ctrl-shift-j = 'move down'
     ctrl-shift-k = 'move up'
     ctrl-shift-l = 'move right'
-
-
 
     # Consider using 'join-with' command as a 'split' replacement if you want to enable
     # normalizations
@@ -96,8 +97,12 @@ default-root-container-layout = 'tiles'
     ctrl-shift-7 = 'move-node-to-workspace 7'
     ctrl-shift-8 = 'move-node-to-workspace 8'
     ctrl-shift-9 = 'move-node-to-workspace 9'
-    ctrl-shift-0 = 'move-node-to-workspace 0'
+    ctrl-shift-0 = 'move-node-to-workspace 10'
 
+    ctrl-alt-i = 'focus-monitor 1'
+    ctrl-alt-m = 'focus-monitor "Built-in Retina Display"'
+    ctrl-alt-shift-i = 'move-node-to-monitor 1'
+    ctrl-alt-shift-m = 'move-node-to-monitor "Built-in Retina Display"'
 
     ctrl-shift-c = 'reload-config'
 
@@ -109,18 +114,35 @@ default-root-container-layout = 'tiles'
     cmd-alt-h = []
 
 [workspace-to-monitor-force-assignment]
-1 = ['Built-in Retina Display', 'DELL P3421W', 'DELL S2721QSA']
-2 = ['Built-in Retina Display', 'DELL P3421W', 'DELL S2721QSA']
+1 = 'Built-in Retina Display'
+2 = 'Built-in Retina Display'
 
-3 = ['DELL P3421W', 'DELL S2721QSA', 'Built-in Retina Display']
-4 = ['DELL P3421W', 'DELL S2721QSA', 'Built-in Retina Display']
-5 = ['DELL P3421W', 'DELL S2721QSA', 'Built-in Retina Display']
-6 = ['DELL P3421W', 'DELL S2721QSA', 'Built-in Retina Display']
-7 = ['DELL P3421W', 'DELL S2721QSA', 'Built-in Retina Display']
+3 = 'DELL P3421W'
+4 = 'DELL P3421W'
+5 = 'DELL P3421W'
+6 = 'DELL P3421W'
+7 = 'DELL P3421W'
 
-8 = ['DELL S2721QSA', 'DELL P3421W', 'Built-in Retina Display']
-9 = ['DELL S2721QSA', 'DELL P3421W', 'Built-in Retina Display']
-10 = ['DELL S2721QSA', 'DELL P3421W', 'Built-in Retina Display']
+8 = 'DELL S2721QSA'
+9 = 'DELL S2721QSA'
+
+10 = 'Sidecar Display (AirPlay)'
+
+#[workspace-to-monitor-force-assignment]
+#1 = ['Built-in Retina Display', 'DELL P3421W', 'DELL S2721QSA']
+#2 = ['Built-in Retina Display', 'DELL P3421W', 'DELL S2721QSA']
+
+#3 = ['DELL P3421W', 'DELL S2721QSA', 'Built-in Retina Display']
+#4 = ['DELL P3421W', 'DELL S2721QSA', 'Built-in Retina Display']
+#5 = ['DELL P3421W', 'DELL S2721QSA', 'Built-in Retina Display']
+#6 = ['DELL P3421W', 'DELL S2721QSA', 'Built-in Retina Display']
+#7 = ['DELL P3421W', 'DELL S2721QSA', 'Built-in Retina Display']
+
+#8 = ['DELL S2721QSA', 'DELL P3421W', 'Built-in Retina Display']
+#9 = ['DELL S2721QSA', 'DELL P3421W', 'Built-in Retina Display']
+#10 = ['Sidecar Display (AirPlay)']
+#10 = ['DELL S2721QSA', 'DELL P3421W', 'Built-in Retina Display']
+
 
 [mode.resize.binding]
     h = 'resize width -70'
