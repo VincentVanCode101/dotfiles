@@ -43,7 +43,10 @@ export PATH="$PATH:$HOME/little-projects/unix-shell-scripts"
 export PATH="$PATH:$HOME/docker-apps/bin"
 export PATH="$PATH:$HOME/projects/toolbox-exec"
 export PATH="$PATH:$HOME/.local/scripts"
+
 export PATH="$PATH:$HOME/.local/bin"
+export PATH="$HOME/.local/bin:$PATH"
+
 export PATH="$PATH:$HOME/.jbang/bin"
 
 export PATH="$PATH:$HOME/.local/share/JetBrains/Toolbox/apps/phpstorm/bin"
@@ -68,6 +71,9 @@ alias dfimage="docker run -v /var/run/docker.sock:/var/run/docker.sock --rm alpi
 
 export VISUAL=vim
 export EDITOR="$VISUAL"
+
+export ANTHROPIC_BASE_URL="http://localhost:11434"
+export ANTHROPIC_AUTH_TOKEN="ollama"
 
 ######################################################################################
 # Custom Functions
