@@ -72,8 +72,8 @@ alias dfimage="docker run -v /var/run/docker.sock:/var/run/docker.sock --rm alpi
 export VISUAL=vim
 export EDITOR="$VISUAL"
 
-export ANTHROPIC_BASE_URL="http://localhost:11434"
-export ANTHROPIC_AUTH_TOKEN="ollama"
+# export ANTHROPIC_BASE_URL="http://localhost:11434"
+# export ANTHROPIC_AUTH_TOKEN="ollama"
 
 ######################################################################################
 # Custom Functions
