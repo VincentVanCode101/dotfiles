@@ -5,8 +5,10 @@
 # Normalizations eliminate all sorts of weird tree configurations that don't make sense.
 # Give normalizations a chance and enable them back.
 
-enable-normalization-flatten-containers = false
-enable-normalization-opposite-orientation-for-nested-containers = false
+
+enable-normalization-flatten-containers = true # was false before... maybe breaks stuff
+enable-normalization-opposite-orientation-for-nested-containers = true # was false before... maybe breaks stuff
+
 start-at-login = true
 # Mouse follows focus when focused monitor changes
 on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
@@ -114,19 +116,19 @@ default-root-container-layout = 'tiles'
     cmd-alt-h = []
 
 [workspace-to-monitor-force-assignment]
-1 = 'Built-in Retina Display'
-2 = 'Built-in Retina Display'
+1 = 1
+2 = 1
 
-3 = 'DELL P3421W'
-4 = 'DELL P3421W'
-5 = 'DELL P3421W'
-6 = 'DELL P3421W'
-7 = 'DELL P3421W'
+3 = 2
+4 = 2
+5 = 2
+6 = 2
+7 = 2
 
-8 = 'DELL S2721QSA'
-9 = 'DELL S2721QSA'
+8 = 3
+9 = 3
 
-10 = 'Sidecar Display (AirPlay)'
+10 = 4
 
 #[workspace-to-monitor-force-assignment]
 #1 = ['Built-in Retina Display', 'DELL P3421W', 'DELL S2721QSA']
@@ -151,3 +153,21 @@ default-root-container-layout = 'tiles'
     l = 'resize width +70'
     enter = 'mode main'
     esc = 'mode main'
+
+# -----------------------------------------------------------------------------
+# Monitor-IDs statt Klarnamen (seit 2026-04-19)
+# -----------------------------------------------------------------------------
+# Die workspace-to-monitor-force-assignment Zuweisung wurde von Monitor-Namen
+# auf numerische IDs umgestellt, um das sogenannte "Spillover"-Problem zu lösen:
+# Dabei landeten Fenster beim Workspace-Wechsel als Overlay auf dem falschen
+# Monitor, weil AeroSpace die Klarnamen unter bestimmten Umständen nicht
+# zuverlässig auflösen konnte (z. B. nach Sleep/Wake oder Monitor-Reconnect).
+#
+# Numerische IDs werden von AeroSpace robuster erkannt als Klarnamen.
+#
+# Mapping der alten Namen auf die neuen IDs:
+#   'Built-in Retina Display'  -> 1  (Workspaces 1, 2)
+#   'DELL P3421W'              -> 2  (Workspaces 3–7)
+#   'DELL S2721QSA'            -> 3  (Workspaces 8, 9)
+#   'Sidecar Display (AirPlay)'-> 4  (Workspace 10)
+# -----------------------------------------------------------------------------
