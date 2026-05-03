@@ -30,9 +30,9 @@ Digest pinning:
 
 Control comments (Hadolint-style):
   Lock a service against 'update --all' by placing one of these comments on
-  the line directly above the image: key:
-    # compose-update: ignore
-    # no-update
+  the line directly above the image: key (compose) or FROM line (Dockerfile):
+    # anchor: ignore
+    # no-update                  (alternative)
   Locked services show [LOCKED] in 'scan' output and are skipped by
   'update --all'. Targeting a locked service by name still updates it
   (with a warning) so the comment can be used as a soft guardrail.
@@ -306,14 +306,17 @@ fetch_digest() {
 
 # --- Service Discovery ---
 
-# A Hadolint-style control comment on the line directly above `image:` locks
-# a service against automated updates. Recognised forms:
-#   # compose-update: ignore
-#   # no-update
+# A Hadolint-style control comment on the line directly above `image:` (or
+# the Dockerfile `FROM` line) locks a service against automated updates.
+# Recognised forms:
+#   # anchor: ignore
+#   # no-update         (alternative)
 # Whitespace tolerant, case-sensitive keywords.
 
-# Output: service_name|compose_file_path|image_string|locked(0|1)
+# Output: type|service_name|file_path|image_string|locked(0|1)
+# type ∈ {compose, dockerfile}
 discover_services() {
+    # Pass 1: compose files
     while IFS= read -r f; do
         local dir dir_name extracted
         dir="$(dirname "$f")"
@@ -332,7 +335,7 @@ discover_services() {
                     lock = 0
                     next
                 }
-                if ($0 ~ /^[[:space:]]*#.*(compose-update:[[:space:]]*ignore|no-update)/) {
+                if ($0 ~ /^[[:space:]]*#.*(anchor:[[:space:]]*ignore|no-update)/) {
                     lock = 1
                     next
                 }
@@ -356,22 +359,62 @@ discover_services() {
         while IFS=$'\t' read -r locked svc_name image_line; do
             [[ -z "$image_line" ]] && continue
             local name="${svc_name:-${dir_name}}"
-            echo "${name}|${f}|${image_line}|${locked}"
+            echo "compose|${name}|${f}|${image_line}|${locked}"
         done <<< "$extracted"
     done < <(find . -maxdepth 2 \( -name "compose.yaml" -o -name "compose.yml" \) | sort)
+
+    # Pass 2: Dockerfiles
+    # Parse `FROM <image>` lines. Skip variable-based FROMs (e.g. FROM $BASE).
+    # Strips --platform=... flag and trailing `AS <stage>` alias.
+    while IFS= read -r f; do
+        local dir dir_name extracted
+        dir="$(dirname "$f")"
+        dir_name="$(basename "$dir")"
+
+        extracted=$(awk '
+            BEGIN { lock = 0 }
+            {
+                if ($0 ~ /^[[:space:]]*#.*(anchor:[[:space:]]*ignore|no-update)/) {
+                    lock = 1
+                    next
+                }
+                if ($0 ~ /^[[:space:]]*[Ff][Rr][Oo][Mm][[:space:]]+/) {
+                    line = $0
+                    sub(/^[[:space:]]*[Ff][Rr][Oo][Mm][[:space:]]+/, "", line)
+                    sub(/^--platform=[^[:space:]]+[[:space:]]+/, "", line)
+                    sub(/[[:space:]]+#.*$/, "", line)
+                    n = split(line, parts, /[[:space:]]+/)
+                    image = parts[1]
+                    if (image ~ /^\$/) { lock = 0; next }
+                    if (image == "")   { lock = 0; next }
+                    print lock "\t" image
+                    lock = 0
+                    next
+                }
+                if ($0 !~ /^[[:space:]]*#/ && $0 !~ /^[[:space:]]*$/) { lock = 0 }
+            }
+        ' "$f")
+
+        [[ -z "$extracted" ]] && continue
+
+        while IFS=$'\t' read -r locked image_line; do
+            [[ -z "$image_line" ]] && continue
+            echo "dockerfile|${dir_name}-build|${f}|${image_line}|${locked}"
+        done <<< "$extracted"
+    done < <(find . -maxdepth 2 -name "Dockerfile" | sort)
 }
 
 # --- Commands ---
 
 cmd_list() {
     echo -e "${BOLD}Discovered services:${NC}\n"
-    printf "  ${BOLD}%-20s %-10s %s${NC}\n" "SERVICE" "LOCK" "IMAGE"
-    printf '  %.0s─' {1..70}; echo
+    printf "  ${BOLD}%-12s %-24s %-10s %s${NC}\n" "TYPE" "SERVICE" "LOCK" "IMAGE"
+    printf '  %.0s─' {1..80}; echo
 
-    discover_services | while IFS='|' read -r name file image locked; do
+    discover_services | while IFS='|' read -r type name file image locked; do
         local lock_label=""
         [[ "$locked" == "1" ]] && lock_label="[LOCKED]"
-        printf "  %-20s %-10s %s\n" "$name" "$lock_label" "$image"
+        printf "  [%-10s %-24s %-10s %s\n" "${type}]" "$name" "$lock_label" "$image"
     done
     echo
 }
@@ -387,7 +430,7 @@ cmd_scan() {
     tmpfile=$(mktemp)
     discover_services > "$tmpfile"
 
-    while IFS='|' read -r name file image locked; do
+    while IFS='|' read -r type name file image locked; do
         IFS='|' read -r registry namespace repo tag <<< "$(parse_image "$image")"
 
         # Fetch available tags for all services, including locked ones
@@ -441,7 +484,7 @@ cmd_scan() {
     echo
     echo -e "  ${DIM}Pin a service:  $(basename "$0") update <service>${NC}"
     echo -e "  ${DIM}Pin all:        $(basename "$0") update --all${NC}"
-    echo -e "  ${DIM}Lock service:   add '# compose-update: ignore' above the image: line${NC}"
+    echo -e "  ${DIM}Lock service:   add '# anchor: ignore' above the image: / FROM line${NC}"
     echo
 }
 
@@ -454,7 +497,7 @@ cmd_update() {
     tmpfile=$(mktemp)
     discover_services > "$tmpfile"
 
-    while IFS='|' read -r name file image locked; do
+    while IFS='|' read -r type name file image locked; do
         if ! $update_all && [[ "$name" != "$target" ]]; then
             continue
         fi
@@ -519,8 +562,19 @@ cmd_update() {
             change_reason="tag only (no digest)"
         fi
 
-        # Replace image in compose file (preserve indentation and quotes)
-        sed -i "s|${image}|${new_image}|" "$file"
+        # Replace image in source file. For Dockerfiles, anchor to the FROM
+        # line so we don't accidentally rewrite matching strings elsewhere
+        # (e.g. in RUN/COPY/labels). Compose replacement stays as a plain
+        # substitution since image: lines are unique per service block.
+        if [[ "$type" == "dockerfile" ]]; then
+            local image_re
+            image_re=$(printf '%s' "$image" | sed 's/[][\.*^$+?{}()|\\/]/\\&/g')
+            sed -i -E \
+                "s|^([[:space:]]*[Ff][Rr][Oo][Mm][[:space:]]+(--platform=[^[:space:]]+[[:space:]]+)?)${image_re}([[:space:]].*)?\$|\1${new_image}\3|" \
+                "$file"
+        else
+            sed -i "s|${image}|${new_image}|" "$file"
+        fi
 
         echo -e "  ${GREEN}✓ ${name} (${change_reason}):${NC} ${DIM}${image}${NC} → ${GREEN}${new_image}${NC}"
     done < "$tmpfile"
