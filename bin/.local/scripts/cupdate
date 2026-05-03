@@ -1,0 +1,559 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# --- Colors ---
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
+BOLD='\033[1m'
+DIM='\033[2m'
+NC='\033[0m'
+
+# --- Helpers ---
+
+usage() {
+    cat <<EOF
+Usage: $(basename "$0") <command> [args]
+
+Commands:
+  scan                Scan all compose files and check for image updates
+  update <service>    Pin a service to the latest stable version
+  update --all        Pin all services to latest stable versions (respects locks)
+  list                List discovered services and their current images
+
+Digest pinning:
+  After resolving the latest stable tag, the linux/amd64 manifest digest is
+  appended to the image reference:  image:tag@sha256:<hex>
+  This freezes the exact image bytes pulled on lab-1 and defeats silent tag
+  replacement at the registry.
+
+Control comments (Hadolint-style):
+  Lock a service against 'update --all' by placing one of these comments on
+  the line directly above the image: key:
+    # compose-update: ignore
+    # no-update
+  Locked services show [LOCKED] in 'scan' output and are skipped by
+  'update --all'. Targeting a locked service by name still updates it
+  (with a warning) so the comment can be used as a soft guardrail.
+
+Examples:
+  $(basename "$0") scan
+  $(basename "$0") update pihole
+  $(basename "$0") update --all
+EOF
+}
+
+# Parse "ghcr.io/open-webui/open-webui:main" into registry|namespace|repo|tag
+# Handles tag@sha256:digest format by stripping the digest before parsing.
+parse_image() {
+    local image="$1"
+    local registry="dockerhub"
+    local namespace repo tag
+
+    # Strip digest if present (repo:tag@sha256:hexhash → repo:tag)
+    if [[ "$image" == *"@sha256:"* ]]; then
+        image="${image%@sha256:*}"
+    fi
+
+    # Extract tag (default: latest)
+    if [[ "$image" == *":"* ]]; then
+        tag="${image##*:}"
+        image="${image%:*}"
+    else
+        tag="latest"
+    fi
+
+    # Detect registry prefix
+    if [[ "$image" == ghcr.io/* ]]; then
+        registry="ghcr"
+        image="${image#ghcr.io/}"
+    elif [[ "$image" == lscr.io/* ]]; then
+        registry="lscr"
+        image="${image#lscr.io/}"
+    elif [[ "$image" == *"."*/* ]]; then
+        registry="other"
+    fi
+
+    # Split namespace/repo
+    if [[ "$image" == *"/"* ]]; then
+        namespace="${image%/*}"
+        repo="${image##*/}"
+    else
+        namespace="library"
+        repo="$image"
+    fi
+
+    echo "${registry}|${namespace}|${repo}|${tag}"
+}
+
+# Reconstruct full image reference from parts + new tag
+build_image_ref() {
+    local registry="$1" namespace="$2" repo="$3" tag="$4"
+    local prefix=""
+
+    case "$registry" in
+        ghcr) prefix="ghcr.io/" ;;
+        lscr) prefix="lscr.io/" ;;
+    esac
+
+    if [[ "$namespace" == "library" ]]; then
+        echo "${repo}:${tag}"
+    else
+        echo "${prefix}${namespace}/${repo}:${tag}"
+    fi
+}
+
+# --- Registry API ---
+
+fetch_dockerhub_tags() {
+    local namespace="$1" repo="$2"
+    local token
+    token=$(curl -sf --max-time 10 \
+        "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${namespace}/${repo}:pull" \
+        2>/dev/null | jq -r '.token // empty') || return 1
+    [[ -z "$token" ]] && return 1
+
+    local url="https://registry-1.docker.io/v2/${namespace}/${repo}/tags/list?n=10000"
+    local all_tags=""
+
+    while [[ -n "$url" ]]; do
+        local response headers body
+        response=$(curl -sf --max-time 15 -D- \
+            -H "Authorization: Bearer $token" \
+            "$url" 2>/dev/null) || break
+
+        headers=$(echo "$response" | sed '/^\r$/q')
+        body=$(echo "$response" | sed '1,/^\r$/d')
+
+        all_tags+=$(echo "$body" | jq -r '.tags[]? // empty' 2>/dev/null)
+        all_tags+=$'\n'
+
+        local next
+        next=$(echo "$headers" | grep -i '^link:' \
+            | sed -n 's/.*<\([^>]*\)>.*/\1/p') || true
+
+        if [[ -n "$next" ]]; then
+            url="https://registry-1.docker.io${next}"
+        else
+            url=""
+        fi
+    done
+
+    echo "$all_tags"
+}
+
+fetch_ghcr_tags() {
+    local namespace="$1" repo="$2"
+    local token
+    token=$(curl -sf --max-time 10 \
+        "https://ghcr.io/token?scope=repository:${namespace}/${repo}:pull" 2>/dev/null \
+        | jq -r '.token // empty' 2>/dev/null) || return 1
+
+    [[ -z "$token" ]] && return 1
+
+    # GHCR defaults to 100 tags per page — request more and follow pagination
+    local url="https://ghcr.io/v2/${namespace}/${repo}/tags/list?n=10000"
+    local all_tags=""
+
+    while [[ -n "$url" ]]; do
+        local response headers body
+        response=$(curl -sf --max-time 15 -D- \
+            -H "Authorization: Bearer $token" \
+            "$url" 2>/dev/null) || break
+
+        headers=$(echo "$response" | sed '/^\r$/q')
+        body=$(echo "$response" | sed '1,/^\r$/d')
+
+        all_tags+=$(echo "$body" | jq -r '.tags[]? // empty' 2>/dev/null)
+        all_tags+=$'\n'
+
+        # Follow Link: <url>; rel="next" if present
+        local next
+        next=$(echo "$headers" | grep -i '^link:' \
+            | sed -n 's/.*<\([^>]*\)>.*/\1/p') || true
+
+        if [[ -n "$next" ]]; then
+            url="https://ghcr.io${next}"
+        else
+            url=""
+        fi
+    done
+
+    echo "$all_tags"
+}
+
+fetch_tags() {
+    local registry="$1" namespace="$2" repo="$3"
+    case "$registry" in
+        dockerhub) fetch_dockerhub_tags "$namespace" "$repo" ;;
+        ghcr)      fetch_ghcr_tags "$namespace" "$repo" ;;
+        lscr)      fetch_ghcr_tags "linuxserver" "$repo" ;;
+        *)         echo "" ;;
+    esac
+}
+
+# Sort version tags numerically, handling mixed v-prefix and CalVer.
+# Strips 'v' prefix for comparison, preserves original tag in output.
+# Input: one tag per line. Output: sorted tags, original form preserved.
+version_sort() {
+    # Strip v/version- prefix for numeric sort, preserve original tag in output.
+    awk '{ norm = $0; sub(/^version-/, "", norm); sub(/^v/, "", norm); print norm "\t" $0 }' \
+        | sort -V -t$'\t' -k1,1 \
+        | cut -f2
+}
+
+# Filter tags to stable releases, return newest.
+# Handles SemVer (v1.2.3), CalVer (2026.04.0), and version-hash (2024.10.22-7ca5933).
+find_latest_stable() {
+    local tags="$1"
+
+    # Pass 1: strict — pure version like 3.5.1, v1.4.5, 2026.04.0, version-6.6.1
+    local result
+    result=$(echo "$tags" \
+        | grep -E '^(version-|v)?[0-9]+(\.[0-9]+)+$' \
+        | grep -viE '(alpha|beta|rc[0-9]*|dev|nightly|edge|canary|pre|snapshot|test|dirty)' \
+        | version_sort \
+        | tail -1) || true
+
+    if [[ -n "$result" ]]; then
+        echo "$result"
+        return
+    fi
+
+    # Pass 2: loose — allow version-hash like 2024.10.22-7ca5933
+    result=$(echo "$tags" \
+        | grep -E '^(version-|v)?[0-9]+(\.[0-9]+)+(-[a-f0-9]+)?$' \
+        | grep -viE '(alpha|beta|rc[0-9]*|dev|nightly|edge|canary|pre|snapshot|test|dirty)' \
+        | version_sort \
+        | tail -1) || true
+
+    echo "$result"
+}
+
+# --- Registry Digest Fetching ---
+# Returns the linux/amd64 manifest digest (sha256:hexhash) for a tag.
+# For multi-arch indexes, parses the manifest list and selects the amd64 entry.
+# For single-arch manifests, reads Docker-Content-Digest from the response header.
+
+ACCEPT_HEADERS="application/vnd.docker.distribution.manifest.v2+json,application/vnd.docker.distribution.manifest.list.v2+json,application/vnd.oci.image.manifest.v1+json,application/vnd.oci.image.index.v1+json"
+
+_fetch_amd64_digest() {
+    # $1 = bearer token, $2 = manifest URL
+    local token="$1" url="$2"
+    local response headers body ctype digest
+
+    response=$(curl -sf -D- --max-time 15 \
+        -H "Authorization: Bearer $token" \
+        -H "Accept: ${ACCEPT_HEADERS}" \
+        "$url" 2>/dev/null) || return 1
+
+    headers=$(echo "$response" | sed '/^\r$/q')
+    body=$(echo "$response" | sed '1,/^\r$/d')
+
+    ctype=$(echo "$headers" | grep -i '^content-type:' \
+        | tr -d '\r' | head -1 | awk '{print tolower($2)}')
+
+    if [[ "$ctype" == *"manifest.list"* || "$ctype" == *"image.index"* ]]; then
+        # Multi-arch: select linux/amd64 entry from the index
+        digest=$(echo "$body" | jq -r '
+            .manifests[]?
+            | select(.platform.os == "linux" and .platform.architecture == "amd64")
+            | .digest
+        ' 2>/dev/null | head -1)
+    else
+        # Single manifest — header digest is the image digest
+        digest=$(echo "$headers" | grep -i '^docker-content-digest:' \
+            | tr -d '\r' | head -1 | awk '{print $2}')
+    fi
+
+    echo "$digest"
+}
+
+fetch_digest_dockerhub() {
+    local namespace="$1" repo="$2" tag="$3"
+    local token
+    token=$(curl -sf --max-time 10 \
+        "https://auth.docker.io/token?service=registry.docker.io&scope=repository:${namespace}/${repo}:pull" \
+        2>/dev/null | jq -r '.token // empty') || return 1
+    [[ -z "$token" ]] && return 1
+
+    _fetch_amd64_digest "$token" \
+        "https://registry-1.docker.io/v2/${namespace}/${repo}/manifests/${tag}"
+}
+
+fetch_digest_ghcr() {
+    local namespace="$1" repo="$2" tag="$3"
+    local token
+    token=$(curl -sf --max-time 10 \
+        "https://ghcr.io/token?scope=repository:${namespace}/${repo}:pull" 2>/dev/null \
+        | jq -r '.token // empty') || return 1
+    [[ -z "$token" ]] && return 1
+
+    _fetch_amd64_digest "$token" \
+        "https://ghcr.io/v2/${namespace}/${repo}/manifests/${tag}"
+}
+
+fetch_digest() {
+    local registry="$1" namespace="$2" repo="$3" tag="$4"
+    case "$registry" in
+        dockerhub) fetch_digest_dockerhub "$namespace" "$repo" "$tag" ;;
+        ghcr)      fetch_digest_ghcr "$namespace" "$repo" "$tag" ;;
+        lscr)      fetch_digest_ghcr "linuxserver" "$repo" "$tag" ;;
+        *)         echo "" ;;
+    esac
+}
+
+# --- Service Discovery ---
+
+# A Hadolint-style control comment on the line directly above `image:` locks
+# a service against automated updates. Recognised forms:
+#   # compose-update: ignore
+#   # no-update
+# Whitespace tolerant, case-sensitive keywords.
+
+# Output: service_name|compose_file_path|image_string|locked(0|1)
+discover_services() {
+    while IFS= read -r f; do
+        local dir dir_name extracted
+        dir="$(dirname "$f")"
+        dir_name="$(basename "$dir")"
+
+        # awk walks all lines; emits one record per image: found.
+        # Lock comment applies only to the immediately following image: line
+        # and resets after that image: is consumed.
+        extracted=$(awk '
+            BEGIN { lock = 0; svc = "" }
+            {
+                if ($0 ~ /^  [a-zA-Z0-9_][a-zA-Z0-9_-]*:/) {
+                    svc = $0
+                    sub(/^[[:space:]]+/, "", svc)
+                    sub(/:.*$/, "", svc)
+                    lock = 0
+                    next
+                }
+                if ($0 ~ /^[[:space:]]*#.*(compose-update:[[:space:]]*ignore|no-update)/) {
+                    lock = 1
+                    next
+                }
+                if ($0 ~ /^[[:space:]]+image:/) {
+                    line = $0
+                    sub(/^[[:space:]]+image:[[:space:]]*/, "", line)
+                    gsub(/["\x27]/, "", line)
+                    sub(/[[:space:]]+#.*$/, "", line)
+                    sub(/^[[:space:]]+/, "", line)
+                    sub(/[[:space:]]+$/, "", line)
+                    print lock "\t" svc "\t" line
+                    lock = 0
+                    next
+                }
+                if ($0 !~ /^[[:space:]]*#/) { lock = 0 }
+            }
+        ' "$f")
+
+        [[ -z "$extracted" ]] && continue
+
+        while IFS=$'\t' read -r locked svc_name image_line; do
+            [[ -z "$image_line" ]] && continue
+            local name="${svc_name:-${dir_name}}"
+            echo "${name}|${f}|${image_line}|${locked}"
+        done <<< "$extracted"
+    done < <(find . -maxdepth 2 \( -name "compose.yaml" -o -name "compose.yml" \) | sort)
+}
+
+# --- Commands ---
+
+cmd_list() {
+    echo -e "${BOLD}Discovered services:${NC}\n"
+    printf "  ${BOLD}%-20s %-10s %s${NC}\n" "SERVICE" "LOCK" "IMAGE"
+    printf '  %.0s─' {1..70}; echo
+
+    discover_services | while IFS='|' read -r name file image locked; do
+        local lock_label=""
+        [[ "$locked" == "1" ]] && lock_label="[LOCKED]"
+        printf "  %-20s %-10s %s\n" "$name" "$lock_label" "$image"
+    done
+    echo
+}
+
+cmd_scan() {
+    echo -e "${BOLD}Scanning compose files for image updates...${NC}\n"
+
+    printf "  ${BOLD}%-16s %-38s %-14s %-14s %s${NC}\n" \
+        "SERVICE" "IMAGE" "CURRENT" "LATEST" "STATUS"
+    printf '  %.0s─' {1..100}; echo
+
+    local tmpfile
+    tmpfile=$(mktemp)
+    discover_services > "$tmpfile"
+
+    while IFS='|' read -r name file image locked; do
+        IFS='|' read -r registry namespace repo tag <<< "$(parse_image "$image")"
+
+        # Fetch available tags for all services, including locked ones
+        local tags latest
+        tags=$(fetch_tags "$registry" "$namespace" "$repo" 2>/dev/null || echo "")
+        latest=$(find_latest_stable "$tags")
+
+        local status_color status_text
+        if [[ -z "$latest" ]]; then
+            status_color="$DIM"
+            status_text="? couldn't fetch tags"
+            latest="—"
+            if [[ "$locked" == "1" ]]; then
+                status_text="🔒 couldn't fetch tags (LOCKED)"
+                status_color="$CYAN"
+            fi
+        elif [[ "$tag" == "latest" || "$tag" == "main" || "$tag" == "master" ]]; then
+            if [[ "$locked" == "1" ]]; then
+                status_color="$CYAN"
+                status_text="🔒 unpinned (LOCKED) — latest stable: ${latest}"
+            else
+                status_color="$RED"
+                status_text="⚠ unpinned → pin to ${latest}"
+            fi
+        elif [[ "$tag" == "$latest" ]]; then
+            if [[ "$locked" == "1" ]]; then
+                status_color="$CYAN"
+                status_text="🔒 up to date (LOCKED)"
+            elif [[ "$image" != *"@sha256:"* ]]; then
+                status_color="$YELLOW"
+                status_text="↑ tag current — missing digest pin"
+            else
+                status_color="$GREEN"
+                status_text="✓ up to date"
+            fi
+        else
+            if [[ "$locked" == "1" ]]; then
+                status_color="$CYAN"
+                status_text="🔒 LOCKED (Update: ${latest} available)"
+            else
+                status_color="$YELLOW"
+                status_text="↑ update available"
+            fi
+        fi
+
+        printf "  %-16s %-38s %-14s %-14s ${status_color}%s${NC}\n" \
+            "$name" "${namespace}/${repo}" "$tag" "$latest" "$status_text"
+    done < "$tmpfile"
+
+    rm -f "$tmpfile"
+    echo
+    echo -e "  ${DIM}Pin a service:  $(basename "$0") update <service>${NC}"
+    echo -e "  ${DIM}Pin all:        $(basename "$0") update --all${NC}"
+    echo -e "  ${DIM}Lock service:   add '# compose-update: ignore' above the image: line${NC}"
+    echo
+}
+
+cmd_update() {
+    local target="$1"
+    local update_all=false
+    [[ "$target" == "--all" ]] && update_all=true
+
+    local tmpfile found=false
+    tmpfile=$(mktemp)
+    discover_services > "$tmpfile"
+
+    while IFS='|' read -r name file image locked; do
+        if ! $update_all && [[ "$name" != "$target" ]]; then
+            continue
+        fi
+        found=true
+
+        # Respect lock on --all. Explicit single-service update proceeds with warning.
+        if [[ "$locked" == "1" ]]; then
+            if $update_all; then
+                echo -e "  ${CYAN}🔒 ${name}: [LOCKED] skipping (remove control comment to unlock)${NC}"
+                continue
+            else
+                echo -e "  ${YELLOW}🔒 ${name}: [LOCKED] — forcing update because service was targeted explicitly${NC}"
+            fi
+        fi
+
+        IFS='|' read -r registry namespace repo tag <<< "$(parse_image "$image")"
+
+        # Capture the digest currently pinned in compose.yaml (if any) so we
+        # can detect a stale / missing pin even when the tag itself is current.
+        local current_digest=""
+        if [[ "$image" == *"@sha256:"* ]]; then
+            current_digest="sha256:${image##*@sha256:}"
+        fi
+
+        local tags latest
+        tags=$(fetch_tags "$registry" "$namespace" "$repo" 2>/dev/null || echo "")
+        latest=$(find_latest_stable "$tags")
+
+        if [[ -z "$latest" ]]; then
+            echo -e "  ${YELLOW}⚠ ${name}: couldn't determine latest stable version — skipping${NC}"
+            continue
+        fi
+
+        # Always fetch the live digest for the target tag — even when the tag
+        # is already current — so we can refresh a missing or stale @sha256
+        # pin against whatever the registry currently serves.
+        local digest
+        digest=$(fetch_digest "$registry" "$namespace" "$repo" "$latest" 2>/dev/null || echo "")
+
+        local new_image
+        new_image=$(build_image_ref "$registry" "$namespace" "$repo" "$latest")
+        if [[ -n "$digest" ]]; then
+            new_image="${new_image}@${digest}"
+        fi
+
+        # Decide whether anything actually changed.
+        if [[ "$new_image" == "$image" ]]; then
+            echo -e "  ${GREEN}✓ ${name}: already at ${latest} with current digest${NC}"
+            continue
+        fi
+
+        # Classify the change for the log line.
+        local change_reason=""
+        if [[ "$tag" != "$latest" ]]; then
+            change_reason="tag ${tag} → ${latest}"
+        elif [[ -z "$current_digest" && -n "$digest" ]]; then
+            change_reason="adding digest pin"
+        elif [[ -n "$current_digest" && -n "$digest" && "$current_digest" != "$digest" ]]; then
+            change_reason="refreshing stale digest"
+        elif [[ -z "$digest" ]]; then
+            echo -e "  ${YELLOW}⚠ ${name}: couldn't fetch digest — pinning tag only${NC}"
+            change_reason="tag only (no digest)"
+        fi
+
+        # Replace image in compose file (preserve indentation and quotes)
+        sed -i "s|${image}|${new_image}|" "$file"
+
+        echo -e "  ${GREEN}✓ ${name} (${change_reason}):${NC} ${DIM}${image}${NC} → ${GREEN}${new_image}${NC}"
+    done < "$tmpfile"
+
+    rm -f "$tmpfile"
+
+    if ! $update_all && ! $found; then
+        echo -e "  ${RED}✗ Service '${target}' not found${NC}"
+        echo -e "  ${DIM}Run '$(basename "$0") list' to see available services${NC}"
+        return 1
+    fi
+}
+
+# --- Main ---
+
+for cmd in curl jq; do
+    if ! command -v "$cmd" &>/dev/null; then
+        echo "Error: '${cmd}' required but not found. Install it first."
+        exit 1
+    fi
+done
+
+case "${1:-}" in
+    scan|--scan)   cmd_scan ;;
+    update)
+        [[ -z "${2:-}" ]] && { echo "Usage: $(basename "$0") update <service|--all>"; exit 1; }
+        cmd_update "$2"
+        ;;
+    list|--list)   cmd_list ;;
+    -h|--help|"")  usage ;;
+    *)
+        echo "Unknown command: $1"
+        usage
+        exit 1
+        ;;
+esac

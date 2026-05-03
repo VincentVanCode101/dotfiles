@@ -511,5 +511,13 @@
     {
         "key": "ctrl+shift+alt+u",
         "command": "-find-it-faster.findWithinFilesWithType"
+    },
+    {
+        "key": "shift+enter",
+        "command": "workbench.action.terminal.sendSequence",
+        "args": {
+            "text": "\u001b\r"
+        },
+        "when": "terminalFocus"
     }
 ]
