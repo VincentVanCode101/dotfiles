@@ -367,9 +367,8 @@ discover_services() {
     # Parse `FROM <image>` lines. Skip variable-based FROMs (e.g. FROM $BASE).
     # Strips --platform=... flag and trailing `AS <stage>` alias.
     while IFS= read -r f; do
-        local dir dir_name extracted
-        dir="$(dirname "$f")"
-        dir_name="$(basename "$dir")"
+        local clean_path extracted
+        clean_path="${f#./}"
 
         extracted=$(awk '
             BEGIN { lock = 0 }
@@ -399,7 +398,7 @@ discover_services() {
 
         while IFS=$'\t' read -r locked image_line; do
             [[ -z "$image_line" ]] && continue
-            echo "dockerfile|${dir_name}-build|${f}|${image_line}|${locked}"
+            echo "dockerfile|${clean_path}|${f}|${image_line}|${locked}"
         done <<< "$extracted"
     done < <(find . -maxdepth 2 -name "Dockerfile" | sort)
 }
@@ -407,28 +406,51 @@ discover_services() {
 # --- Commands ---
 
 cmd_list() {
-    echo -e "${BOLD}Discovered services:${NC}\n"
-    printf "  ${BOLD}%-12s %-24s %-10s %s${NC}\n" "TYPE" "SERVICE" "LOCK" "IMAGE"
-    printf '  %.0s─' {1..80}; echo
+    local tmpfile
+    tmpfile=$(mktemp)
+    discover_services > "$tmpfile"
 
-    discover_services | while IFS='|' read -r type name file image locked; do
+    local svc_w=16 label
+    while IFS='|' read -r type name file image locked; do
+        label="[${type}] ${name}"
+        (( ${#label} > svc_w )) && svc_w=${#label}
+    done < "$tmpfile"
+
+    local lock_w=10 img_w=60
+    local total=$(( svc_w + 1 + lock_w + 1 + img_w ))
+
+    echo -e "${BOLD}Discovered services:${NC}\n"
+    printf "  ${BOLD}%-*s %-*s %s${NC}\n" "$svc_w" "SERVICE" "$lock_w" "LOCK" "IMAGE"
+    printf '  '; local i; for ((i=0; i<total; i++)); do printf '─'; done; echo
+
+    while IFS='|' read -r type name file image locked; do
         local lock_label=""
         [[ "$locked" == "1" ]] && lock_label="[LOCKED]"
-        printf "  [%-10s %-24s %-10s %s\n" "${type}]" "$name" "$lock_label" "$image"
-    done
+        printf "  %-*s %-*s %s\n" "$svc_w" "[${type}] ${name}" "$lock_w" "$lock_label" "$image"
+    done < "$tmpfile"
+    rm -f "$tmpfile"
     echo
 }
 
 cmd_scan() {
     echo -e "${BOLD}Scanning compose files for image updates...${NC}\n"
 
-    printf "  ${BOLD}%-16s %-38s %-14s %-14s %s${NC}\n" \
-        "SERVICE" "IMAGE" "CURRENT" "LATEST" "STATUS"
-    printf '  %.0s─' {1..100}; echo
-
     local tmpfile
     tmpfile=$(mktemp)
     discover_services > "$tmpfile"
+
+    local svc_w=16 label
+    while IFS='|' read -r type name file image locked; do
+        label="[${type}] ${name}"
+        (( ${#label} > svc_w )) && svc_w=${#label}
+    done < "$tmpfile"
+
+    local img_w=38 cur_w=14 lat_w=14 stat_w=14
+    local total=$(( svc_w + 1 + img_w + 1 + cur_w + 1 + lat_w + 1 + stat_w ))
+
+    printf "  ${BOLD}%-*s %-*s %-*s %-*s %s${NC}\n" \
+        "$svc_w" "SERVICE" "$img_w" "IMAGE" "$cur_w" "CURRENT" "$lat_w" "LATEST" "STATUS"
+    printf '  '; local i; for ((i=0; i<total; i++)); do printf '─'; done; echo
 
     while IFS='|' read -r type name file image locked; do
         IFS='|' read -r registry namespace repo tag <<< "$(parse_image "$image")"
@@ -476,8 +498,12 @@ cmd_scan() {
             fi
         fi
 
-        printf "  %-16s %-38s %-14s %-14s ${status_color}%s${NC}\n" \
-            "$name" "${namespace}/${repo}" "$tag" "$latest" "$status_text"
+        printf "  %-*s %-*s %-*s %-*s ${status_color}%s${NC}\n" \
+            "$svc_w" "[${type}] ${name}" \
+            "$img_w" "${namespace}/${repo}" \
+            "$cur_w" "$tag" \
+            "$lat_w" "$latest" \
+            "$status_text"
     done < "$tmpfile"
 
     rm -f "$tmpfile"
