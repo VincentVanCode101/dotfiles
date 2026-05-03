@@ -1,0 +1,90 @@
+{
+    "layer": "top",
+    "position": "top",
+    "height": 22,
+    "spacing": 4,
+
+    "modules-left": [
+        "sway/workspaces",
+        "sway/mode"
+    ],
+
+    "modules-center": [
+        "sway/window"
+    ],
+
+    "modules-right": [
+        "network",
+        "disk",
+        "battery",
+        "cpu",
+        "pulseaudio",
+        "clock"
+    ],
+
+    // ── Workspaces ──────────────────────────────────────────────────────────────
+    "sway/workspaces": {
+        "disable-scroll": false,
+        "all-outputs": false,
+        "format": "{name}"
+    },
+
+    "sway/mode": {
+        "format": " {}"
+    },
+
+    "sway/window": {
+        "max-length": 60
+    },
+
+    // ── Network (replicates ethernet _first_ + wireless _first_) ────────────────
+    "network": {
+        "interval": 5,
+        "format-wifi":       " {signalStrength}% {essid} {ipaddr}",
+        "format-ethernet":   "{ipaddr} ({bandwidthDownBits})",
+        "format-disconnected": "no ip",
+        "tooltip-format-wifi":     "{essid} ({signalStrength}%) via {gwaddr}",
+        "tooltip-format-ethernet": "{ifname}: {ipaddr}/{cidr}"
+    },
+
+    // ── Disk (replicates disk "/" { format = "%avail" }) ────────────────────────
+    "disk": {
+        "interval": 30,
+        "format": "{free}",
+        "path": "/"
+    },
+
+    // ── Battery (replicates battery all) ────────────────────────────────────────
+    "battery": {
+        "interval": 5,
+        "states": {
+            "warning": 30,
+            "critical": 11
+        },
+        "format":          "{icon} {capacity}% {time}",
+        "format-charging": " {capacity}% {time}",
+        "format-full":     " {capacity}%",
+        "format-unknown":  " {capacity}%",
+        "format-icons":    ["", "", "", "", ""],
+        "format-time":     "{H}:{M:02}"
+    },
+
+    // ── CPU / Load (replicates load { format = "%1min" }) ────────────────────────
+    "cpu": {
+        "interval": 5,
+        "format": "{load}"
+    },
+
+    // ── Pulseaudio (replicates volume master) ────────────────────────────────────
+    "pulseaudio": {
+        "format":       "🔉 {volume}%",
+        "format-muted": "🔇 {volume}%",
+        "on-click":     "pavucontrol"
+    },
+
+    // ── Clock (replicates tztime local) ─────────────────────────────────────────
+    "clock": {
+        "interval": 5,
+        "format": " {:%a %Y-%m-%d ⌚ %H:%M %Z}"
+    }
+}

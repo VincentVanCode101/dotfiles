@@ -1,0 +1,99 @@
+/* Waybar style — mirrors i3bar default look
+   Font: JetBrains Mono Regular 10
+   Position: top, dark bg, separator | between modules            */
+
+* {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10pt;
+    border: none;
+    border-radius: 0;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+}
+
+window#waybar {
+    background-color: #000000;
+    color: #ffffff;
+}
+
+/* Separator between right-side modules (replicates separator_symbol |) */
+.modules-right > widget > * {
+    border-left: 1px solid #666666;
+    padding: 0 6px;
+}
+
+.modules-right > widget:first-child > * {
+    border-left: none;
+}
+
+.modules-left > widget > *,
+.modules-center > widget > * {
+    padding: 0 6px;
+}
+
+/* ── Workspaces ──────────────────────────────────────────────────────────── */
+
+#workspaces button {
+    padding: 0 5px;
+    background-color: #222222;
+    color: #888888;
+    border: 1px solid #333333;
+    margin: 1px 1px;
+}
+
+/* Active/focused workspace — mirrors i3bar focused: bg #4c7899 border #285577 */
+#workspaces button.focused {
+    background-color: #4c7899;
+    border-color: #285577;
+    color: #ffffff;
+}
+
+/* Visible but not focused (active on another output) */
+#workspaces button.active {
+    background-color: #333333;
+    border-color: #333333;
+    color: #ffffff;
+}
+
+/* Urgent workspace */
+#workspaces button.urgent {
+    background-color: #900000;
+    border-color: #2f343a;
+    color: #ffffff;
+}
+
+#workspaces button:hover {
+    background-color: #333333;
+    color: #ffffff;
+}
+
+/* ── Mode indicator ──────────────────────────────────────────────────────── */
+
+#mode {
+    background-color: #000000;
+    color: #ffffff;
+    padding: 0 6px;
+}
+
+/* ── Modules ─────────────────────────────────────────────────────────────── */
+
+#window,
+#network,
+#disk,
+#battery,
+#cpu,
+#pulseaudio,
+#clock {
+    color: #ffffff;
+    background-color: #000000;
+}
+
+/* Battery warning / critical states */
+#battery.warning {
+    color: #ffff00;
+}
+
+#battery.critical {
+    color: #ff0000;
+}
