@@ -2,8 +2,8 @@
 
 WINDOW_NAME="web.whatsapp.com"
 
-if xdotool search --name "$WINDOW_NAME" windowactivate --sync; then
-  echo "window $WINDOW_NAME found and focus shifted" &>/dev/null
+if swaymsg "[title=\"$WINDOW_NAME\"] focus" 2>/dev/null | jq -e 'first | .success' > /dev/null 2>&1; then
+  : # window found, focused
 else
   google-chrome --app=https://web.whatsapp.com/ &
 fi

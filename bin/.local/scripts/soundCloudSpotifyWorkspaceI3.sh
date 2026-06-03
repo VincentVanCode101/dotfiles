@@ -1,46 +1,31 @@
 #!/usr/bin/env bash
 
-i3-msg workspace "Sountify"
+swaymsg workspace "Sountify"
 
-soundcloud_regex="soundcloud.com__discover"
 soundcloud_url="https://soundcloud.com/discover"
-
 
 open_soundcloud() {
     google-chrome --profile-directory="Profile 2" --app="$soundcloud_url" --class="Soundcloud" &
 }
 
+# Check sway tree for any window whose name contains "soundcloud"
+soundcloud_open() {
+    swaymsg -t get_tree \
+        | jq -r '[.. | objects | select(.name?) | .name] | .[]' \
+        | grep -qi soundcloud
+}
 
-chrome_windows=$(xdotool search --onlyvisible --class "Google-chrome")
-if [ -z "$chrome_windows" ]; then
+if ! soundcloud_open; then
     open_soundcloud
-else
-    soundcloud_found=false
-    for win_id in $chrome_windows; do
-        wm_class=$(xprop -id "$win_id" WM_CLASS)
-        if [[ $wm_class =~ $soundcloud_regex ]]; then
-            soundcloud_found=true
-            break
-        fi
-    done
-    
-    if [ "$soundcloud_found" = false ]; then
-        open_soundcloud
-    fi
 fi
 
-spotify_regex="spotify"
+# Spotify: check by app_id or window name
+spotify_open() {
+    swaymsg -t get_tree \
+        | jq -r '[.. | objects | select(.app_id? or .name?) | (.app_id // ""), (.name // "")] | .[]' \
+        | grep -qi spotify
+}
 
-spotify_windows=$(xdotool search --class "Spotify")
-
-if [ -z "$spotify_windows" ]; then
+if ! spotify_open; then
     spotify &
-else
-    for win_id in $spotify_windows; do
-        wm_class=$(xprop -id "$win_id" WM_CLASS)
-        if [[ ! $wm_class =~ $spotify_regex ]]; then
-            spotify &
-            break
-        fi
-    done
 fi

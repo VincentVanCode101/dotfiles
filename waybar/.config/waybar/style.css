@@ -1,6 +1,12 @@
 /* Waybar style — mirrors i3bar default look
    Font: JetBrains Mono Regular 10
    Position: top, dark bg, separator | between modules            */
+window#waybar {
+    background: #000000;
+    /* Solid black */
+    color: #ffffff;
+    border: none;
+}
 
 * {
     font-family: "JetBrains Mono", monospace;
@@ -18,17 +24,17 @@ window#waybar {
 }
 
 /* Separator between right-side modules (replicates separator_symbol |) */
-.modules-right > widget > * {
+.modules-right>widget>* {
     border-left: 1px solid #666666;
     padding: 0 6px;
 }
 
-.modules-right > widget:first-child > * {
+.modules-right>widget:first-child>* {
     border-left: none;
 }
 
-.modules-left > widget > *,
-.modules-center > widget > * {
+.modules-left>widget>*,
+.modules-center>widget>* {
     padding: 0 6px;
 }
 

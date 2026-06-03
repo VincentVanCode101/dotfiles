@@ -1,3 +1,6 @@
+exec hash dbus-update-activation-environment 2>/dev/null && \
+     dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP SWAYSOCK
+
 # Sway config — migrated from i3
 # https://swaywm.org/
 
@@ -7,14 +10,20 @@ set $mod2 Mod1
 
 font pango:JetBrains Mono Regular 10
 
+input "type:keyboard" {
+    xkb_layout "de"
+    # Optional: If you prefer no "dead keys" (typing ~ or ^ immediately)
+    # xkb_variant "nodeadkeys"
+}
+
 ####################################################################################
 # AUTOSTART
 ####################################################################################
 
-exec --no-startup-id dex --autostart --environment sway
-exec --no-startup-id nm-applet --indicator
-exec --no-startup-id syncthing
-exec --no-startup-id /usr/bin/gnome-keyring-daemon --start --components=ssh,secrets
+exec dex --autostart --environment sway
+exec nm-applet --indicator
+exec /usr/bin/syncthing
+exec /usr/bin/gnome-keyring-daemon --start --components=ssh,secrets
 
 # Screen lock on idle (replaces xss-lock + xautolock; 120 min = 7200 s)
 exec swayidle -w \
@@ -241,8 +250,7 @@ bindsym Ctrl+$mod+Print exec grim -g "$(swaymsg -t get_tree | jq -r '.. | select
 
 bindsym $mod+Control+l exec swaylock -c 000000
 
-# TODO: update ~/.local/scripts/lockAndSuspend.sh — replace i3lock with swaylock
-bindsym $mod+Ctrl+period exec --no-startup-id ~/.local/scripts/lockAndSuspend.sh
+bindsym $mod+Ctrl+period exec ~/.local/scripts/lockAndSuspend.sh
 
 ####################################################################################
 # BORDERS
@@ -280,25 +288,24 @@ for_window [class="teams.microsoft.com"] move container to workspace $wsM
 # APPLICATION LAUNCHERS
 ####################################################################################
 
-# TODO: update setUpi3WmWorkspaceNo1.sh — replace i3-msg with swaymsg
-bindsym $mod+Ctrl+1 exec --no-startup-id ~/.local/scripts/setUpi3WmWorkspaceNo1.sh
+bindsym $mod+Ctrl+1 exec ~/.local/scripts/setUpi3WmWorkspaceNo1.sh
 
-bindsym $mod+n       exec --no-startup-id ~/.local/scripts/notes.sh "$HOME/personal/notes/second-brain/weekly-notes"
-bindsym $mod+Shift+n exec --no-startup-id ~/.local/scripts/notes.sh "$HOME/work/notes"
+bindsym $mod+n       exec ~/.local/scripts/notes.sh "$HOME/personal/notes/second-brain/weekly-notes"
+bindsym $mod+Shift+n exec ~/.local/scripts/notes.sh "$HOME/work/notes"
 
-bindsym $mod+Ctrl+n exec --no-startup-id nautilus
-bindsym $mod+Ctrl+g exec --no-startup-id google-chrome
-bindsym $mod+Ctrl+f exec --no-startup-id firefox
-bindsym $mod+Ctrl+c exec --no-startup-id env XDG_CURRENT_DESKTOP=GNOME gnome-control-center
-bindsym $mod+Ctrl+b exec --no-startup-id blueman-manager
-bindsym $mod+Ctrl+O exec --no-startup-id obsidian
+bindsym $mod+Ctrl+n exec nautilus
+bindsym $mod+Ctrl+g exec google-chrome
+bindsym $mod+Ctrl+f exec firefox
+bindsym $mod+Ctrl+c exec env XDG_CURRENT_DESKTOP=GNOME gnome-control-center
+bindsym $mod+Ctrl+b exec blueman-manager
+bindsym $mod+Ctrl+O exec obsidian
 bindsym $mod+c      exec zenity --calendar
 
-bindsym $mod+Ctrl+t exec --no-startup-id telegram-desktop
-bindsym $mod+Ctrl+w exec --no-startup-id ~/.local/scripts/whatsapp
-bindsym $mod+Ctrl+k exec --no-startup-id keepassxc
-bindsym $mod+Ctrl+m exec --no-startup-id ~/.local/scripts/teams
-bindsym $mod+Ctrl+s exec --no-startup-id ~/.local/scripts/soundCloudSpotifyWorkspaceI3.sh
+bindsym $mod+Ctrl+t exec telegram-desktop
+bindsym $mod+Ctrl+w exec ~/.local/scripts/whatsapp
+bindsym $mod+Ctrl+k exec keepassxc
+bindsym $mod+Ctrl+m exec ~/.local/scripts/teams
+bindsym $mod+Ctrl+s exec ~/.local/scripts/soundCloudSpotifyWorkspaceI3.sh
 
 ####################################################################################
 # GAPS MODE
@@ -414,6 +421,4 @@ mode "$mode_gaps_left" {
 # BAR
 ####################################################################################
 
-bar {
-    swaybar_command waybar
-}
+exec_always "killall waybar; waybar"

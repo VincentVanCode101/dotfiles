@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# 1. Variablen setzen (VOR dem Start von Sway)
+export GBM_BACKEND=nvidia-drm
+export __GLX_VENDOR_LIBRARY_NAME=nvidia
+export WLR_NO_HARDWARE_CURSORS=1
+export WLR_RENDERER=pixman
+export XDG_CURRENT_DESKTOP=sway
+export XDG_SESSION_TYPE=wayland
+
+# 2. Umgebung an DBus senden (ESSENZIELL für Waybar)
+# Das löst den Portal-Hang (Timeout)
+dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE
+
+# 3. Sway als LETZTEN Befehl starten
+exec sway --unsupported-gpu

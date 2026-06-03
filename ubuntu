@@ -4,7 +4,7 @@ OS=$(uname -s | tr '[:upper:]' '[:lower:]')
 
 case "$OS" in
     linux)
-        STOW_FOLDERS="zsh-linux,i3,nvim,tmux-linux,bin,code-linux,polybar"
+        STOW_FOLDERS="zsh-linux,i3,sway,waybar,nvim,tmux-linux,bin,code-linux,polybar"
         ;;
     darwin)
         STOW_FOLDERS="code-mac,zsh-mac,tmux-mac,bin,aerospace"
